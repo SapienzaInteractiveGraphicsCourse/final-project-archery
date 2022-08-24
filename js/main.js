@@ -2,7 +2,6 @@
 
 import * as THREE from 'three';
 import {OrbitControls} from './examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from './examples/jsm/loaders/GLTFLoader.js'; //per bow 
 
 function resizeRendererToDisplaySize(/**@type THREE.WebGLRenderer*/ renderer) {
     const canvas = renderer.domElement;
