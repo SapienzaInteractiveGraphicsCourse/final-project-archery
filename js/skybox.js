@@ -60,13 +60,13 @@ function main() {
   {
     const loader = new THREE.CubeTextureLoader();
     const texture = loader.load([
-      '../forest_lf.png',
-      '../forest_rt.png',
-      '../forest_up.png',
-      '../forest_dn.png',
-      '../forest_bk.png',
-      '../forest_ft.png',
-      
+      '../skybox_images/forest_lf.png',
+      '../skybox_images/forest_rt.png',
+      '../skybox_images/forest_up.png',
+      '../skybox_images/forest_dn.png',
+      '../skybox_images/forest_bk.png',
+      '../skybox_images/forest_ft.png',
+
     ]);
     scene.background = texture;
   }
@@ -101,7 +101,7 @@ loader.load( '../bow.glb', function ( gltf ) {
 
 //fsd
 
-  
+
 
   function render(time) {
     time *= 0.001;
