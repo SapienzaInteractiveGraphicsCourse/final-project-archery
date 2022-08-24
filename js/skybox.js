@@ -60,12 +60,12 @@ function main() {
   {
     const loader = new THREE.CubeTextureLoader();
     const texture = loader.load([
-      '../skybox_images/forest_lf.png',
-      '../skybox_images/forest_rt.png',
-      '../skybox_images/forest_up.png',
-      '../skybox_images/forest_dn.png',
-      '../skybox_images/forest_bk.png',
-      '../skybox_images/forest_ft.png',
+      '../assets/skybox_images/forest_lf.png',
+      '../assets/skybox_images/forest_rt.png',
+      '../assets/skybox_images/forest_up.png',
+      '../assets/skybox_images/forest_dn.png',
+      '../assets/skybox_images/forest_bk.png',
+      '../assets/skybox_images/forest_ft.png',
 
     ]);
     scene.background = texture;
@@ -89,7 +89,7 @@ function main() {
   //trying gltf model
   const loader = new GLTFLoader();
 
-loader.load( '../bow.glb', function ( gltf ) {
+loader.load( '../assets/bow.glb', function ( gltf ) {
 
 	scene.add( gltf.scene );
 
