@@ -2,6 +2,8 @@
 
 import * as THREE from 'three';
 import {OrbitControls} from './examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from './examples/jsm/loaders/GLTFLoader.js';
+
 
 function resizeRendererToDisplaySize(/**@type THREE.WebGLRenderer*/ renderer) {
     const canvas = renderer.domElement;
@@ -44,7 +46,14 @@ function main() {
     const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
     function makeInstance(geometry, color, x) {
-        const material = new THREE.MeshPhongMaterial({color});
+        
+       const loader = new THREE.TextureLoader();
+      const material = new THREE.MeshBasicMaterial({
+    	map: loader.load("../assets/1.jpeg"),
+  		});
+
+        //
+        //const material = new THREE.MeshPhongMaterial({color});
         const cube = new THREE.Mesh(geometry, material);
         cube.position.x = x;
 
@@ -71,6 +80,25 @@ function main() {
         scene.background = texture;
     }
 
+
+    const loader = new GLTFLoader();
+
+loader.load( '../assets/bow.glb', function ( gltf ) {
+  gltf.scene.children[0].scale.multiplyScalar(0.3);
+  gltf.scene.children[0].position.z=1;
+  gltf.scene.children[0].rotation.y=-5.5;
+  gltf.scene.children[0].rotation.z=0;
+  
+
+	scene.add( gltf.scene );
+
+
+}, undefined, function ( error ) {
+
+	console.error( error );
+
+} );
+
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
 
@@ -88,17 +116,18 @@ function main() {
             camera.aspect = canvas.clientWidth / canvas.clientHeight;
             camera.updateProjectionMatrix();
         }
-
+            /*
         cubes.forEach((cube, ndx) => {
             const speed = 1 + ndx * .1;
             const rot = time * speed;
             cube.rotation.x = rot;
             cube.rotation.y = rot;
-        });
+        });*/
 
         raycaster.setFromCamera(pointer, camera);
         const intersects = raycaster.intersectObjects(scene.children, false);
         if(intersects.length > 0) {
+            
             intersects[0].object.material.color.setRGB(255, 255, 255);
         }
 
