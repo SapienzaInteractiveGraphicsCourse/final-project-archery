@@ -83,21 +83,46 @@ function main() {
 
     const loader = new GLTFLoader();
 
-loader.load( '../assets/bow.glb', function ( gltf ) {
-  gltf.scene.children[0].scale.multiplyScalar(0.3);
+loader.load( '../assets/simple_bow.glb', function ( gltf ) {
+  gltf.scene.children[0].scale.multiplyScalar(0.1);
   gltf.scene.children[0].position.z=1;
-  gltf.scene.children[0].rotation.y=-5.5;
-  gltf.scene.children[0].rotation.z=0;
-  
-
+  gltf.scene.children[0].rotation.y=-0.5;
+  gltf.scene.children[0].rotation.z=1;
 	scene.add( gltf.scene );
-
-
 }, undefined, function ( error ) {
-
 	console.error( error );
-
 } );
+//archery_target
+loader.load( '../assets/targets/archery_target.glb', function ( gltf ) {
+    //gltf.scene.children[0].scale.multiplyScalar(0.3);
+    gltf.scene.children[0].position.z=-4;
+      scene.add( gltf.scene );
+  }, undefined, function ( error ) {
+      console.error( error );
+  } );
+//
+
+  loader.load( '../assets/targets/target.glb', function ( gltf ) {
+    gltf.scene.children[0].scale.multiplyScalar(0.3);
+    gltf.scene.children[0].position.z=-4;
+    gltf.scene.children[0].position.x=2;
+
+      scene.add( gltf.scene );
+  }, undefined, function ( error ) {
+      console.error( error );
+
+  } );
+  //
+
+  loader.load( '../assets/targets/bullseye_target_custom_ue4_collison_included.glb', function ( gltf ) {
+    gltf.scene.children[0].scale.multiplyScalar(0.1);
+    gltf.scene.children[0].position.z=-4;
+    gltf.scene.children[0].position.x=-3;
+
+      scene.add( gltf.scene );
+  }, undefined, function ( error ) {
+      console.error( error );
+  } );
 
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
