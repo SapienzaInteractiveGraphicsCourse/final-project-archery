@@ -45,12 +45,35 @@ function main() {
     const boxDepth = 1;
     const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
-    function makeInstance(geometry, color, x) {
+    function makeInstance1(geometry, color, x) {
 
         const loader = new THREE.TextureLoader();
+      
         const material = new THREE.MeshBasicMaterial({
-    	    map: loader.load("../assets/1.jpeg"),
-  		});
+                map: loader.load("../assets/1.jpeg"),
+            });
+
+        
+
+        //
+        //const material = new THREE.MeshPhongMaterial({color});
+        const cube = new THREE.Mesh(geometry, material);
+        cube.position.x = x;
+        cube.position.y = 1.5;
+
+
+        scene.add(cube);
+        return cube;
+    }
+    function makeInstance2(geometry, color, x) {
+
+        const loader = new THREE.TextureLoader();
+      
+        const material = new THREE.MeshBasicMaterial({
+                map: loader.load("../assets/2.jpeg"),
+            });
+
+        
 
         //
         //const material = new THREE.MeshPhongMaterial({color});
@@ -60,54 +83,89 @@ function main() {
         scene.add(cube);
         return cube;
     }
+    function makeInstance3(geometry, color, x) {
+
+        const loader = new THREE.TextureLoader();
+      
+        const material = new THREE.MeshBasicMaterial({
+                map: loader.load("../assets/3.jpeg"),
+            });
+
+        
+
+        //
+        //const material = new THREE.MeshPhongMaterial({color});
+        const cube = new THREE.Mesh(geometry, material);
+        cube.position.x = x;
+        cube.position.y=-1.5;
+
+        scene.add(cube);
+        return cube;
+    }
 
     const cubes = [
-        makeInstance(geometry, 0x44aa88,  0),
-        makeInstance(geometry, 0x8844aa, -2),
-        makeInstance(geometry, 0xaa8844,  2),
+        makeInstance2(geometry, 0x44aa88,  8),
+        makeInstance1(geometry, 0x8844aa, 8),
+        makeInstance3(geometry, 0xaa8844,  8),
     ];
 
     {
         const loader = new THREE.CubeTextureLoader();
         const texture = loader.load([
-            '../assets/skybox_images/forest_lf.png',
-            '../assets/skybox_images/forest_rt.png',
-            '../assets/skybox_images/forest_up.png',
-            '../assets/skybox_images/forest_dn.png',
-            '../assets/skybox_images/forest_bk.png',
-            '../assets/skybox_images/forest_ft.png'
+            
+            '../assets/skybox_images/forest-x.png',
+                '../assets/skybox_images/forest+x.png',
+                '../assets/skybox_images/forest+y.png',
+                '../assets/skybox_images/forest-y.png',
+                '../assets/skybox_images/forest+z.png',
+                '../assets/skybox_images/forest-z.png'
+            
+           
         ]);
         scene.background = texture;
     }
 
 
     const loader = new GLTFLoader();
+    //ARCO
 
     loader.load( '../assets/simple_bow.glb', function ( gltf ) {
         gltf.scene.children[0].scale.multiplyScalar(0.1);
-        gltf.scene.children[0].position.z=1;
-        gltf.scene.children[0].rotation.y=-0.5;
-        gltf.scene.children[0].rotation.z=1;
+        gltf.scene.children[0].position.z=3;
+        gltf.scene.children[0].rotation.y=-12.55;
+        gltf.scene.children[0].rotation.z=-1.7;
+
+        scene.add( gltf.scene );
+    }, undefined, function ( error ) {
+        console.error( error );
+    });
+//arrow
+    loader.load( '../assets/arrow.glb', function ( gltf ) {
+        gltf.scene.children[0].scale.multiplyScalar(0.03);
+        gltf.scene.children[0].position.z=2.2;
+        //gltf.scene.children[0].rotation.y=-12.55;
+        //gltf.scene.children[0].rotation.z=-1.7;
 
         scene.add( gltf.scene );
     }, undefined, function ( error ) {
         console.error( error );
     });
 
-    //archery_target
+    //target0
     loader.load( '../assets/targets/archery_target.glb', function ( gltf ) {
         //gltf.scene.children[0].scale.multiplyScalar(0.3);
-        gltf.scene.children[0].position.z=-4;
+        gltf.scene.children[0].position.z=-24;
         scene.add( gltf.scene );
     }, undefined, function ( error ) {
         console.error( error );
     } );
     //
 
+    //target1
     loader.load( '../assets/targets/target.glb', function ( gltf ) {
         gltf.scene.children[0].scale.multiplyScalar(0.3);
-        gltf.scene.children[0].position.z=-4;
-        gltf.scene.children[0].position.x=2;
+        gltf.scene.children[0].position.z=-10;
+        gltf.scene.children[0].position.x=7;
 
         scene.add( gltf.scene );
     }, undefined, function ( error ) {
@@ -115,11 +173,11 @@ function main() {
 
     } );
     //
-
+    //target2
     loader.load( '../assets/targets/bullseye_target_custom_ue4_collison_included.glb', function ( gltf ) {
         gltf.scene.children[0].scale.multiplyScalar(0.1);
-        gltf.scene.children[0].position.z=-4;
-        gltf.scene.children[0].position.x=-3;
+        gltf.scene.children[0].position.z=-10;
+        gltf.scene.children[0].position.x=-7;
 
         scene.add( gltf.scene );
     }, undefined, function ( error ) {
@@ -132,6 +190,35 @@ function main() {
     function onPointerMove( event ) {
         pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
         pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
+        //scene.background=null;
+        /*
+        {
+            const loader = new THREE.CubeTextureLoader();
+            const texture = loader.load([
+                
+                '../assets/skybox_images/sky-x.png',
+                '../assets/skybox_images/sky+x.png',
+                '../assets/skybox_images/sky+y.png',
+                '../assets/skybox_images/sky-y.png',
+                '../assets/skybox_images/sky+z.png',
+                '../assets/skybox_images/sky-z.png'
+                
+                
+                // o questa
+
+
+                '../assets/skybox_images/lava-x.png',
+                '../assets/skybox_images/lava+x.png',
+                '../assets/skybox_images/lava+y.png',
+                '../assets/skybox_images/lava-y.png',
+                '../assets/skybox_images/lava+z.png',
+                '../assets/skybox_images/lava-z.png'
+            ]);
+            
+            scene.background = texture;
+        }
+*/
+
     }
     document.addEventListener('mousemove', onPointerMove);
 
@@ -154,9 +241,13 @@ function main() {
         raycaster.setFromCamera(pointer, camera);
         const intersects = raycaster.intersectObjects(scene.children, false);
         if(intersects.length > 0) {
-            intersects[0].object.material.color.setRGB(255, 255, 255);
+            intersects[0].object.material.color.setRGB(255,255,255);
         }
+        //per annullare la scena
 
+        //scene.background=null;
+        
+        //
         renderer.render(scene, camera);
 
         requestAnimationFrame(render);
