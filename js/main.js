@@ -46,10 +46,10 @@ function main() {
     const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
     function makeInstance(geometry, color, x) {
-        
-       const loader = new THREE.TextureLoader();
-      const material = new THREE.MeshBasicMaterial({
-    	map: loader.load("../assets/1.jpeg"),
+
+        const loader = new THREE.TextureLoader();
+        const material = new THREE.MeshBasicMaterial({
+    	    map: loader.load("../assets/1.jpeg"),
   		});
 
         //
@@ -83,46 +83,48 @@ function main() {
 
     const loader = new GLTFLoader();
 
-loader.load( '../assets/simple_bow.glb', function ( gltf ) {
-  gltf.scene.children[0].scale.multiplyScalar(0.1);
-  gltf.scene.children[0].position.z=1;
-  gltf.scene.children[0].rotation.y=-0.5;
-  gltf.scene.children[0].rotation.z=1;
-	scene.add( gltf.scene );
-}, undefined, function ( error ) {
-	console.error( error );
-} );
-//archery_target
-loader.load( '../assets/targets/archery_target.glb', function ( gltf ) {
-    //gltf.scene.children[0].scale.multiplyScalar(0.3);
-    gltf.scene.children[0].position.z=-4;
-      scene.add( gltf.scene );
-  }, undefined, function ( error ) {
-      console.error( error );
-  } );
-//
+    loader.load( '../assets/simple_bow.glb', function ( gltf ) {
+        gltf.scene.children[0].scale.multiplyScalar(0.1);
+        gltf.scene.children[0].position.z=1;
+        gltf.scene.children[0].rotation.y=-0.5;
+        gltf.scene.children[0].rotation.z=1;
 
-  loader.load( '../assets/targets/target.glb', function ( gltf ) {
-    gltf.scene.children[0].scale.multiplyScalar(0.3);
-    gltf.scene.children[0].position.z=-4;
-    gltf.scene.children[0].position.x=2;
+        scene.add( gltf.scene );
+    }, undefined, function ( error ) {
+        console.error( error );
+    });
 
-      scene.add( gltf.scene );
-  }, undefined, function ( error ) {
-      console.error( error );
+    //archery_target
+    loader.load( '../assets/targets/archery_target.glb', function ( gltf ) {
+        //gltf.scene.children[0].scale.multiplyScalar(0.3);
+        gltf.scene.children[0].position.z=-4;
+        scene.add( gltf.scene );
+    }, undefined, function ( error ) {
+        console.error( error );
+    } );
+    //
 
-  } );
-  //
+    loader.load( '../assets/targets/target.glb', function ( gltf ) {
+        gltf.scene.children[0].scale.multiplyScalar(0.3);
+        gltf.scene.children[0].position.z=-4;
+        gltf.scene.children[0].position.x=2;
 
-  loader.load( '../assets/targets/bullseye_target_custom_ue4_collison_included.glb', function ( gltf ) {
-    gltf.scene.children[0].scale.multiplyScalar(0.1);
-    gltf.scene.children[0].position.z=-4;
-    gltf.scene.children[0].position.x=-3;
+        scene.add( gltf.scene );
+    }, undefined, function ( error ) {
+        console.error( error );
 
-      scene.add( gltf.scene );
-  }, undefined, function ( error ) {
-      console.error( error );
-  } );
+    } );
+    //
+
+    loader.load( '../assets/targets/bullseye_target_custom_ue4_collison_included.glb', function ( gltf ) {
+        gltf.scene.children[0].scale.multiplyScalar(0.1);
+        gltf.scene.children[0].position.z=-4;
+        gltf.scene.children[0].position.x=-3;
+
+        scene.add( gltf.scene );
+    }, undefined, function ( error ) {
+        console.error( error );
+    } );
 
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
@@ -152,7 +154,6 @@ loader.load( '../assets/targets/archery_target.glb', function ( gltf ) {
         raycaster.setFromCamera(pointer, camera);
         const intersects = raycaster.intersectObjects(scene.children, false);
         if(intersects.length > 0) {
-            
             intersects[0].object.material.color.setRGB(255, 255, 255);
         }
 
