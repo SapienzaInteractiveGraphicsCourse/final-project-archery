@@ -50,7 +50,7 @@ function main() {
         const loader = new THREE.TextureLoader();
 
         const material = new THREE.MeshBasicMaterial({
-            map: loader.load("../assets/1.jpeg"),
+            map: loader.load("/assets/1.jpeg"),
         });
 
         const cube = new THREE.Mesh(geometry, material);
@@ -65,7 +65,7 @@ function main() {
         const loader = new THREE.TextureLoader();
 
         const material = new THREE.MeshBasicMaterial({
-            map: loader.load("../assets/2.jpeg"),
+            map: loader.load("/assets/2.jpeg"),
         });
 
         const cube = new THREE.Mesh(geometry, material);
@@ -79,7 +79,7 @@ function main() {
         const loader = new THREE.TextureLoader();
 
         const material = new THREE.MeshBasicMaterial({
-            map: loader.load("../assets/3.jpeg"),
+            map: loader.load("/assets/3.jpeg"),
         });
 
         const cube = new THREE.Mesh(geometry, material);
@@ -99,12 +99,12 @@ function main() {
     {
         const loader = new THREE.CubeTextureLoader();
         const texture = loader.load([
-            '../assets/skybox_images/forest-x.png',
-            '../assets/skybox_images/forest+x.png',
-            '../assets/skybox_images/forest+y.png',
-            '../assets/skybox_images/forest-y.png',
-            '../assets/skybox_images/forest+z.png',
-            '../assets/skybox_images/forest-z.png'
+            '/assets/skybox_images/forest-x.png',
+            '/assets/skybox_images/forest+x.png',
+            '/assets/skybox_images/forest+y.png',
+            '/assets/skybox_images/forest-y.png',
+            '/assets/skybox_images/forest+z.png',
+            '/assets/skybox_images/forest-z.png'
         ]);
         scene.background = texture;
     }
@@ -113,7 +113,7 @@ function main() {
     const loader = new GLTFLoader();
     //ARCO
 
-    loader.load( '../assets/simple_bow.glb', function ( gltf ) {
+    loader.load( '/assets/simple_bow.glb', function ( gltf ) {
         gltf.scene.children[0].scale.multiplyScalar(0.1);
         gltf.scene.children[0].position.z=3;
         gltf.scene.children[0].rotation.y=-12.55;
@@ -124,7 +124,7 @@ function main() {
         console.error( error );
     });
 //arrow
-    loader.load( '../assets/arrow.glb', function ( gltf ) {
+    loader.load( '/assets/arrow.glb', function ( gltf ) {
         gltf.scene.children[0].scale.multiplyScalar(0.03);
         gltf.scene.children[0].position.z=2.2;
         //gltf.scene.children[0].rotation.y=-12.55;
@@ -136,7 +136,7 @@ function main() {
     });
 
     //target0
-    loader.load( '../assets/targets/archery_target.glb', function ( gltf ) {
+    loader.load( '/assets/targets/archery_target.glb', function ( gltf ) {
         //gltf.scene.children[0].scale.multiplyScalar(0.3);
         gltf.scene.children[0].position.z=-24;
         scene.add( gltf.scene );
@@ -146,7 +146,7 @@ function main() {
     //
 
     //target1
-    loader.load( '../assets/targets/target.glb', function ( gltf ) {
+    loader.load( '/assets/targets/target.glb', function ( gltf ) {
         gltf.scene.children[0].scale.multiplyScalar(0.3);
         gltf.scene.children[0].position.z=-10;
         gltf.scene.children[0].position.x=7;
@@ -158,7 +158,7 @@ function main() {
     } );
     //
     //target2
-    loader.load( '../assets/targets/bullseye_target_custom_ue4_collison_included.glb', function ( gltf ) {
+    loader.load( '/assets/targets/bullseye_target_custom_ue4_collison_included.glb', function ( gltf ) {
         gltf.scene.children[0].scale.multiplyScalar(0.1);
         gltf.scene.children[0].position.z=-10;
         gltf.scene.children[0].position.x=-7;
@@ -180,23 +180,23 @@ function main() {
             const loader = new THREE.CubeTextureLoader();
             const texture = loader.load([
 
-                '../assets/skybox_images/sky-x.png',
-                '../assets/skybox_images/sky+x.png',
-                '../assets/skybox_images/sky+y.png',
-                '../assets/skybox_images/sky-y.png',
-                '../assets/skybox_images/sky+z.png',
-                '../assets/skybox_images/sky-z.png'
+                '/assets/skybox_images/sky-x.png',
+                '/assets/skybox_images/sky+x.png',
+                '/assets/skybox_images/sky+y.png',
+                '/assets/skybox_images/sky-y.png',
+                '/assets/skybox_images/sky+z.png',
+                '/assets/skybox_images/sky-z.png'
 
 
                 // o questa
 
 
-                '../assets/skybox_images/lava-x.png',
-                '../assets/skybox_images/lava+x.png',
-                '../assets/skybox_images/lava+y.png',
-                '../assets/skybox_images/lava-y.png',
-                '../assets/skybox_images/lava+z.png',
-                '../assets/skybox_images/lava-z.png'
+                '/assets/skybox_images/lava-x.png',
+                '/assets/skybox_images/lava+x.png',
+                '/assets/skybox_images/lava+y.png',
+                '/assets/skybox_images/lava-y.png',
+                '/assets/skybox_images/lava+z.png',
+                '/assets/skybox_images/lava-z.png'
             ]);
 
             scene.background = texture;
