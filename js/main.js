@@ -48,19 +48,14 @@ function main() {
     function makeInstance1(geometry, color, x) {
 
         const loader = new THREE.TextureLoader();
-      
+
         const material = new THREE.MeshBasicMaterial({
-                map: loader.load("../assets/1.jpeg"),
-            });
+            map: loader.load("../assets/1.jpeg"),
+        });
 
-        
-
-        //
-        //const material = new THREE.MeshPhongMaterial({color});
         const cube = new THREE.Mesh(geometry, material);
         cube.position.x = x;
         cube.position.y = 1.5;
-
 
         scene.add(cube);
         return cube;
@@ -68,15 +63,11 @@ function main() {
     function makeInstance2(geometry, color, x) {
 
         const loader = new THREE.TextureLoader();
-      
+
         const material = new THREE.MeshBasicMaterial({
-                map: loader.load("../assets/2.jpeg"),
-            });
+            map: loader.load("../assets/2.jpeg"),
+        });
 
-        
-
-        //
-        //const material = new THREE.MeshPhongMaterial({color});
         const cube = new THREE.Mesh(geometry, material);
         cube.position.x = x;
 
@@ -86,15 +77,11 @@ function main() {
     function makeInstance3(geometry, color, x) {
 
         const loader = new THREE.TextureLoader();
-      
+
         const material = new THREE.MeshBasicMaterial({
-                map: loader.load("../assets/3.jpeg"),
-            });
+            map: loader.load("../assets/3.jpeg"),
+        });
 
-        
-
-        //
-        //const material = new THREE.MeshPhongMaterial({color});
         const cube = new THREE.Mesh(geometry, material);
         cube.position.x = x;
         cube.position.y=-1.5;
@@ -104,23 +91,20 @@ function main() {
     }
 
     const cubes = [
-        makeInstance2(geometry, 0x44aa88,  8),
+        makeInstance2(geometry, 0x44aa88, 8),
         makeInstance1(geometry, 0x8844aa, 8),
-        makeInstance3(geometry, 0xaa8844,  8),
+        makeInstance3(geometry, 0xaa8844, 8),
     ];
 
     {
         const loader = new THREE.CubeTextureLoader();
         const texture = loader.load([
-            
             '../assets/skybox_images/forest-x.png',
-                '../assets/skybox_images/forest+x.png',
-                '../assets/skybox_images/forest+y.png',
-                '../assets/skybox_images/forest-y.png',
-                '../assets/skybox_images/forest+z.png',
-                '../assets/skybox_images/forest-z.png'
-            
-           
+            '../assets/skybox_images/forest+x.png',
+            '../assets/skybox_images/forest+y.png',
+            '../assets/skybox_images/forest-y.png',
+            '../assets/skybox_images/forest+z.png',
+            '../assets/skybox_images/forest-z.png'
         ]);
         scene.background = texture;
     }
@@ -195,15 +179,15 @@ function main() {
         {
             const loader = new THREE.CubeTextureLoader();
             const texture = loader.load([
-                
+
                 '../assets/skybox_images/sky-x.png',
                 '../assets/skybox_images/sky+x.png',
                 '../assets/skybox_images/sky+y.png',
                 '../assets/skybox_images/sky-y.png',
                 '../assets/skybox_images/sky+z.png',
                 '../assets/skybox_images/sky-z.png'
-                
-                
+
+
                 // o questa
 
 
@@ -214,7 +198,7 @@ function main() {
                 '../assets/skybox_images/lava+z.png',
                 '../assets/skybox_images/lava-z.png'
             ]);
-            
+
             scene.background = texture;
         }
 */
@@ -246,7 +230,7 @@ function main() {
         //per annullare la scena
 
         //scene.background=null;
-        
+
         //
         renderer.render(scene, camera);
 
