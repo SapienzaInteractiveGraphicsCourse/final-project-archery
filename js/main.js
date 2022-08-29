@@ -205,6 +205,7 @@ function main() {
             new_cube.material.emissive.setRGB(0,10,10);
             selected_menu = new_cube;
         }
+        else selected_menu = undefined;
 
         renderer.render(scene, camera);
 
