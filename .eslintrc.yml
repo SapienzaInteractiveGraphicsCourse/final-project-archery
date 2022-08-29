@@ -8,7 +8,7 @@ parserOptions:
 rules:
   indent:
     - error
-    - 4
+    - tab, 4
   linebreak-style:
     - error
     - unix
