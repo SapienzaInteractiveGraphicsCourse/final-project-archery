@@ -49,7 +49,7 @@ function main() {
 
         const loader = new THREE.TextureLoader();
 
-        const material = new THREE.MeshBasicMaterial({
+        const material = new THREE.MeshPhongMaterial({
             map: loader.load("/assets/menu/1.jpeg"),
         });
 
@@ -64,7 +64,7 @@ function main() {
 
         const loader = new THREE.TextureLoader();
 
-        const material = new THREE.MeshBasicMaterial({
+        const material = new THREE.MeshPhongMaterial({
             map: loader.load("/assets/menu/2.jpeg"),
         });
 
@@ -78,7 +78,7 @@ function main() {
 
         const loader = new THREE.TextureLoader();
 
-        const material = new THREE.MeshBasicMaterial({
+        const material = new THREE.MeshPhongMaterial({
             map: loader.load("/assets/menu/3.jpeg"),
         });
 
@@ -90,9 +90,9 @@ function main() {
         return cube;
     }
 
-    const cubes = [
-        makeInstance2(geometry, 0x44aa88, 8),
+    const menu_cubes = [
         makeInstance1(geometry, 0x8844aa, 8),
+        makeInstance2(geometry, 0x44aa88, 8),
         makeInstance3(geometry, 0xaa8844, 8),
     ];
 
@@ -174,37 +174,16 @@ function main() {
     function onPointerMove( event ) {
         pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
         pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
-        //scene.background=null;
-        /*
-        {
-            const loader = new THREE.CubeTextureLoader();
-            const texture = loader.load([
-
-                '/assets/skybox_images/sky-x.png',
-                '/assets/skybox_images/sky+x.png',
-                '/assets/skybox_images/sky+y.png',
-                '/assets/skybox_images/sky-y.png',
-                '/assets/skybox_images/sky+z.png',
-                '/assets/skybox_images/sky-z.png'
-
-
-                // o questa
-
-
-                '/assets/skybox_images/lava-x.png',
-                '/assets/skybox_images/lava+x.png',
-                '/assets/skybox_images/lava+y.png',
-                '/assets/skybox_images/lava-y.png',
-                '/assets/skybox_images/lava+z.png',
-                '/assets/skybox_images/lava-z.png'
-            ]);
-
-            scene.background = texture;
-        }
-*/
-
     }
     document.addEventListener('mousemove', onPointerMove);
+
+    let selected_menu;
+
+    document.addEventListener('mouseup', () => {
+        if(selected_menu !== undefined) {
+            console.log('Level change');
+        }
+    });
 
     function render(time) {
         time *= 0.001;
@@ -214,24 +193,19 @@ function main() {
             camera.aspect = canvas.clientWidth / canvas.clientHeight;
             camera.updateProjectionMatrix();
         }
-            /*
-        cubes.forEach((cube, ndx) => {
-            const speed = 1 + ndx * .1;
-            const rot = time * speed;
-            cube.rotation.x = rot;
-            cube.rotation.y = rot;
-        });*/
 
         raycaster.setFromCamera(pointer, camera);
-        const intersects = raycaster.intersectObjects(scene.children, false);
-        if(intersects.length > 0) {
-            intersects[0].object.material.color.setRGB(255,255,255);
+        const intersects = raycaster.intersectObjects(menu_cubes, false);
+
+        if(selected_menu !== undefined) {
+            selected_menu.material.emissive.setRGB(0,0,0);
         }
-        //per annullare la scena
+        if(intersects.length > 0) {
+            const new_cube = intersects[0].object;
+            new_cube.material.emissive.setRGB(0,10,10);
+            selected_menu = new_cube;
+        }
 
-        //scene.background=null;
-
-        ////
         renderer.render(scene, camera);
 
         requestAnimationFrame(render);
