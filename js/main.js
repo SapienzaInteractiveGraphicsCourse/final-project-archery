@@ -123,7 +123,7 @@ function main() {
     }, undefined, function ( error ) {
         console.error( error );
     });
-//arrow
+//arrow kwroeop
     loader.load( '/assets/arrow.glb', function ( gltf ) {
         gltf.scene.children[0].scale.multiplyScalar(0.03);
         gltf.scene.children[0].position.z=2.2;
