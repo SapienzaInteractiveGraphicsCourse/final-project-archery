@@ -25,32 +25,38 @@ const assets = {
     target0: {url: "/assets/targets/archery_target.glb", loader: "gltf"},
     target1: {url: "/assets/targets/target.glb", loader: "gltf"},
     target2: {url: "/assets/targets/bullseye_target_custom_ue4_collison_included.glb", loader: "gltf"},
-    skybox_forest: {url: [
+    skybox_forest: {
+        url: [
             '/assets/skybox_images/forest-x.png',
             '/assets/skybox_images/forest+x.png',
             '/assets/skybox_images/forest+y.png',
             '/assets/skybox_images/forest-y.png',
             '/assets/skybox_images/forest+z.png',
             '/assets/skybox_images/forest-z.png'
-        ], loader: 'cubetexture'
+        ],
+        loader: 'cubetexture'
     },
-    skybox_sky: {url: [
+    skybox_sky: {
+        url: [
             '/assets/skybox_images/sky-x.png',
             '/assets/skybox_images/sky+x.png',
             '/assets/skybox_images/sky+y.png',
             '/assets/skybox_images/sky-y.png',
             '/assets/skybox_images/sky+z.png',
             '/assets/skybox_images/sky-z.png'
-        ], loader: 'cubetexture'
+        ],
+        loader: 'cubetexture'
     },
-    skybox_lava: {url: [
+    skybox_lava: {
+        url: [
             '/assets/skybox_images/lava-x.png',
             '/assets/skybox_images/lava+x.png',
             '/assets/skybox_images/lava+y.png',
             '/assets/skybox_images/lava-y.png',
             '/assets/skybox_images/lava+z.png',
             '/assets/skybox_images/lava-z.png'
-        ], loader: 'cubetexture'
+        ],
+        loader: 'cubetexture'
     }
 };
 
@@ -69,7 +75,7 @@ function main() {
     };
     manager.onProgress = (url, loaded, total) => {
         console.log(`Loaded ${url} (${loaded}/${total})`);
-        progressBar.style.width = `${loaded / total * 100 | 0}%`
+        progressBar.style.width = `${loaded / total * 100 | 0}%`;
     };
     manager.onError = url => console.error(url);
 
@@ -174,7 +180,7 @@ function init() {
         scene.add(gltf.scene);
     }
 
-//arrow kwroeop
+    //arrow kwroeop
     {
         const gltf = assets.arrow;
         gltf.scene.children[0].scale.multiplyScalar(0.03);
