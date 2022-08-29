@@ -50,7 +50,7 @@ function main() {
         const loader = new THREE.TextureLoader();
 
         const material = new THREE.MeshBasicMaterial({
-            map: loader.load("/assets/1.jpeg"),
+            map: loader.load("/assets/menu/1.jpeg"),
         });
 
         const cube = new THREE.Mesh(geometry, material);
@@ -65,7 +65,7 @@ function main() {
         const loader = new THREE.TextureLoader();
 
         const material = new THREE.MeshBasicMaterial({
-            map: loader.load("/assets/2.jpeg"),
+            map: loader.load("/assets/menu/2.jpeg"),
         });
 
         const cube = new THREE.Mesh(geometry, material);
@@ -79,7 +79,7 @@ function main() {
         const loader = new THREE.TextureLoader();
 
         const material = new THREE.MeshBasicMaterial({
-            map: loader.load("/assets/3.jpeg"),
+            map: loader.load("/assets/menu/3.jpeg"),
         });
 
         const cube = new THREE.Mesh(geometry, material);
