@@ -125,46 +125,19 @@ function init() {
     const boxDepth = 1;
     const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
-    function makeInstance1(geometry, color, x) {
-        const material = new THREE.MeshPhongMaterial({
-            map: assets.menu1,
-        });
-
+    function makeMenuCube(geometry, x, y, map) {
+        const material = new THREE.MeshPhongMaterial({map});
         const cube = new THREE.Mesh(geometry, material);
-        cube.position.x = x;
-        cube.position.y = 1.5;
-
-        scene.add(cube);
-        return cube;
-    }
-    function makeInstance2(geometry, color, x) {
-        const material = new THREE.MeshPhongMaterial({
-            map: assets.menu2,
-        });
-
-        const cube = new THREE.Mesh(geometry, material);
-        cube.position.x = x;
-
-        scene.add(cube);
-        return cube;
-    }
-    function makeInstance3(geometry, color, x) {
-        const material = new THREE.MeshPhongMaterial({
-            map: assets.menu3,
-        });
-
-        const cube = new THREE.Mesh(geometry, material);
-        cube.position.x = x;
-        cube.position.y=-1.5;
+        cube.position.set(x, y, 0);
 
         scene.add(cube);
         return cube;
     }
 
     const menu_cubes = [
-        makeInstance1(geometry, 0x8844aa, 8),
-        makeInstance2(geometry, 0x44aa88, 8),
-        makeInstance3(geometry, 0xaa8844, 8),
+        makeMenuCube(geometry, 8, 1.5, assets.menu1),
+        makeMenuCube(geometry, 8, 0, assets.menu2),
+        makeMenuCube(geometry, 8, -1.5, assets.menu3),
     ];
 
     scene.background = assets.skybox_forest;
@@ -221,11 +194,10 @@ function init() {
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
 
-    function onPointerMove( event ) {
+    document.addEventListener('mousemove', event => {
         pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
         pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
-    }
-    document.addEventListener('mousemove', onPointerMove);
+    });
 
     let selected_menu;
 
