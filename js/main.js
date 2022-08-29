@@ -103,6 +103,8 @@ function init() {
     light.position.set(-1, 10, 4);
     scene.add(light);
 
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
     const controls = new OrbitControls(camera, canvas);
     controls.target.set(0, 0, 0);
     controls.update();
