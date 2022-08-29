@@ -16,7 +16,74 @@ function resizeRendererToDisplaySize(/**@type THREE.WebGLRenderer*/ renderer) {
     return false;
 }
 
+const assets = {
+    menu1: {url: "/assets/menu/1.jpeg", loader: "texture"},
+    menu2: {url: "/assets/menu/2.jpeg", loader: "texture"},
+    menu3: {url: "/assets/menu/3.jpeg", loader: "texture"},
+    bow: {url: "/assets/simple_bow.glb", loader: "gltf"},
+    arrow: {url: "/assets/arrow.glb", loader: "gltf"},
+    target0: {url: "/assets/targets/archery_target.glb", loader: "gltf"},
+    target1: {url: "/assets/targets/target.glb", loader: "gltf"},
+    target2: {url: "/assets/targets/bullseye_target_custom_ue4_collison_included.glb", loader: "gltf"},
+    skybox_forest: {url: [
+            '/assets/skybox_images/forest-x.png',
+            '/assets/skybox_images/forest+x.png',
+            '/assets/skybox_images/forest+y.png',
+            '/assets/skybox_images/forest-y.png',
+            '/assets/skybox_images/forest+z.png',
+            '/assets/skybox_images/forest-z.png'
+        ], loader: 'cubetexture'
+    },
+    skybox_sky: {url: [
+            '/assets/skybox_images/sky-x.png',
+            '/assets/skybox_images/sky+x.png',
+            '/assets/skybox_images/sky+y.png',
+            '/assets/skybox_images/sky-y.png',
+            '/assets/skybox_images/sky+z.png',
+            '/assets/skybox_images/sky-z.png'
+        ], loader: 'cubetexture'
+    },
+    skybox_lava: {url: [
+            '/assets/skybox_images/lava-x.png',
+            '/assets/skybox_images/lava+x.png',
+            '/assets/skybox_images/lava+y.png',
+            '/assets/skybox_images/lava-y.png',
+            '/assets/skybox_images/lava+z.png',
+            '/assets/skybox_images/lava-z.png'
+        ], loader: 'cubetexture'
+    }
+};
+
 function main() {
+    const manager = new THREE.LoadingManager();
+    manager.onLoad = () => {
+        const keys = Object.keys(assets);
+        for(const key of keys) {
+            assets[key] = assets[key].result;
+        }
+        init();
+    };
+    manager.onError = url => console.error(url);
+    manager.onProgress = (url, loaded, total) => {
+        console.log('Loaded', url, loaded, total);
+    };
+
+    const loaders = {
+        'texture': new THREE.TextureLoader(manager),
+        'gltf': new GLTFLoader(manager),
+        'cubetexture': new THREE.CubeTextureLoader(manager)
+    };
+
+    for(const asset of Object.values(assets)) {
+        const loader = loaders[asset.loader];
+        if(loader) {
+            loader.load(asset.url, (result) => asset.result = result, undefined, error => console.error(error));
+        }
+        else console.error(`Invalid loader ${asset.loader} for asset ${asset.url}`);
+    }
+}
+
+function init() {
     const canvas = document.querySelector("#canvas");
     const renderer = new THREE.WebGLRenderer({canvas});
 
@@ -46,11 +113,8 @@ function main() {
     const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
     function makeInstance1(geometry, color, x) {
-
-        const loader = new THREE.TextureLoader();
-
         const material = new THREE.MeshPhongMaterial({
-            map: loader.load("/assets/menu/1.jpeg"),
+            map: assets.menu1,
         });
 
         const cube = new THREE.Mesh(geometry, material);
@@ -61,11 +125,8 @@ function main() {
         return cube;
     }
     function makeInstance2(geometry, color, x) {
-
-        const loader = new THREE.TextureLoader();
-
         const material = new THREE.MeshPhongMaterial({
-            map: loader.load("/assets/menu/2.jpeg"),
+            map: assets.menu2,
         });
 
         const cube = new THREE.Mesh(geometry, material);
@@ -75,11 +136,8 @@ function main() {
         return cube;
     }
     function makeInstance3(geometry, color, x) {
-
-        const loader = new THREE.TextureLoader();
-
         const material = new THREE.MeshPhongMaterial({
-            map: loader.load("/assets/menu/3.jpeg"),
+            map: assets.menu3,
         });
 
         const cube = new THREE.Mesh(geometry, material);
@@ -96,77 +154,56 @@ function main() {
         makeInstance3(geometry, 0xaa8844, 8),
     ];
 
-    {
-        const loader = new THREE.CubeTextureLoader();
-        const texture = loader.load([
-            '/assets/skybox_images/forest-x.png',
-            '/assets/skybox_images/forest+x.png',
-            '/assets/skybox_images/forest+y.png',
-            '/assets/skybox_images/forest-y.png',
-            '/assets/skybox_images/forest+z.png',
-            '/assets/skybox_images/forest-z.png'
-        ]);
-        scene.background = texture;
-    }
+    scene.background = assets.skybox_forest;
 
-
-    const loader = new GLTFLoader();
     //ARCO
 
-    loader.load( '/assets/simple_bow.glb', function ( gltf ) {
+    {
+        const gltf = assets.bow;
         gltf.scene.children[0].scale.multiplyScalar(0.1);
         gltf.scene.children[0].position.z=3;
         gltf.scene.children[0].rotation.y=-12.55;
         gltf.scene.children[0].rotation.z=-1.7;
+        scene.add(gltf.scene);
+    }
 
-        scene.add( gltf.scene );
-    }, undefined, function ( error ) {
-        console.error( error );
-    });
 //arrow kwroeop
-    loader.load( '/assets/arrow.glb', function ( gltf ) {
+    {
+        const gltf = assets.arrow;
         gltf.scene.children[0].scale.multiplyScalar(0.03);
         gltf.scene.children[0].position.z=2.2;
         //gltf.scene.children[0].rotation.y=-12.55;
         //gltf.scene.children[0].rotation.z=-1.7;
 
         scene.add( gltf.scene );
-    }, undefined, function ( error ) {
-        console.error( error );
-    });
+    }
 
     //target0
-    loader.load( '/assets/targets/archery_target.glb', function ( gltf ) {
-        //gltf.scene.children[0].scale.multiplyScalar(0.3);
+    {
+        const gltf = assets.target0;
         gltf.scene.children[0].position.z=-24;
         scene.add( gltf.scene );
-    }, undefined, function ( error ) {
-        console.error( error );
-    } );
-    //
+    }
 
     //target1
-    loader.load( '/assets/targets/target.glb', function ( gltf ) {
+    {
+        const gltf = assets.target1;
         gltf.scene.children[0].scale.multiplyScalar(0.3);
         gltf.scene.children[0].position.z=-10;
         gltf.scene.children[0].position.x=7;
 
         scene.add( gltf.scene );
-    }, undefined, function ( error ) {
-        console.error( error );
+    }
 
-    } );
-    //
     //target2
-    loader.load( '/assets/targets/bullseye_target_custom_ue4_collison_included.glb', function ( gltf ) {
+    {
+        const gltf = assets.target2;
         gltf.scene.children[0].scale.multiplyScalar(0.1);
         gltf.scene.children[0].position.z=-10;
         gltf.scene.children[0].position.x=-7;
 
         scene.add( gltf.scene );
-    }, undefined, function ( error ) {
-        console.error( error );
-    } );
+    }
 
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
