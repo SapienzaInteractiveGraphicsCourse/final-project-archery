@@ -56,17 +56,22 @@ const assets = {
 
 function main() {
     const manager = new THREE.LoadingManager();
+    const loadingScreen = document.querySelector("#loadingscreen");
+    const progressBar = document.querySelector("#progressbar");
+
     manager.onLoad = () => {
         const keys = Object.keys(assets);
         for(const key of keys) {
             assets[key] = assets[key].result;
         }
+        loadingScreen.style.display = 'none';
         init();
     };
-    manager.onError = url => console.error(url);
     manager.onProgress = (url, loaded, total) => {
-        console.log('Loaded', url, loaded, total);
+        console.log(`Loaded ${url} (${loaded}/${total})`);
+        progressBar.style.width = `${loaded / total * 100 | 0}%`
     };
+    manager.onError = url => console.error(url);
 
     const loaders = {
         'texture': new THREE.TextureLoader(manager),

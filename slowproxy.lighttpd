@@ -1,0 +1,9 @@
+#! /usr/sbin/lighttpd -Df
+# Serve files slowly to test loading screen
+# Run while `python -m http.server` is running
+
+server.document-root = "/dev/null"
+server.modules = ("mod_proxy")
+server.kbytes-per-second = 2000
+server.port = 8001
+proxy.server  = ( "" => (( "host" => "127.0.0.1", "port" => 8000 )))

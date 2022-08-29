@@ -3,18 +3,69 @@
         <title>Archery</title>
         <style>
             html, body {
-               margin: 0;
-               height: 100%;
+                margin: 0;
+                height: 100%;
+                font-family: sans-serif;
             }
             #canvas {
-               width: 100%;
-               height: 100%;
-               display: block;
+                width: 100%;
+                height: 100%;
+                display: block;
+            }
+            #loadingscreen {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                font-size: xx-large;
+                background-color: #eee;
+            }
+            #loadingscreen > div > div {
+                padding: 2px;
+            }
+            #progress {
+                width: 50vw;
+                border: 1.5px solid black;
+            }
+            #progressbar {
+                width: 0;
+                height: 1em;
+                background-image: linear-gradient(
+                    45deg,
+                    #ddd 25%,
+                    #888 25%,
+                    #888 50%,
+                    #ddd 50%,
+                    #ddd 75%,
+                    #888 75%
+                );
+                transition: width ease-out .2s;
+                background-size: 2em 2em;
+                animation: progress-animation 1s linear infinite;
+            }
+            @keyframes progress-animation {
+                0% {
+                    background-position: 2em 0;
+                }
+                100% {
+                    background-position: 0 0;
+                }
             }
         </style>
     </head>
     <body>
         <canvas id="canvas"></canvas>
+        <div id="loadingscreen">
+            <div>
+                <div>Loading...</div>
+                <div id="progress"><div id="progressbar"></div></div>
+            </div>
+        </div>
         <script type="importmap">
         {
             "imports": {
