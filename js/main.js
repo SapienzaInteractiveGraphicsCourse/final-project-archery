@@ -11,15 +11,30 @@ import {EffectComposer} from './examples/jsm/postprocessing/EffectComposer.js';
 import {RenderPass} from './examples/jsm/postprocessing/RenderPass.js';
 import {OutlinePass} from './examples/jsm/postprocessing/OutlinePass.js';
 
-function resizeToDisplaySize(/**@type THREE.WebGLRenderer*/ renderer, camera) {
-    const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
+class CameraManager {
+    constructor() {
+        this.cameras = [];
+    }
+    addCamera(camera, resize) {
+        this.cameras.push({camera,resize});
+    }
+    resizeToDisplaySize(renderer, canvas) {
+        if(this._resizeRendererToDisplaySize(renderer)) {
+            for(const {camera,resize} of this.cameras) {
+                resize(camera, canvas);
+            }
+        }
+    }
+    _resizeRendererToDisplaySize(renderer) {
+        const canvas = renderer.domElement;
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
 
-    if(canvas.width !== width || canvas.height !== height) {
-        renderer.setSize(width, height, false);
-        camera.aspect = canvas.clientWidth / canvas.clientHeight;
-        camera.updateProjectionMatrix();
+        if(canvas.width !== width || canvas.height !== height) {
+            renderer.setSize(width, height, false);
+            return true;
+        }
+        return false;
     }
 }
 
@@ -105,14 +120,20 @@ function main() {
 function init() {
     const canvas = document.querySelector("#canvas");
     const renderer = new THREE.WebGLRenderer({canvas});
+    renderer.autoClear = false;
 
     const fov = 75;
     const aspect = 2;
     const near = 0.1;
     const far = 100;
     const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-
     camera.position.z = 2;
+
+    const cameraManager = new CameraManager();
+    cameraManager.addCamera(camera, (camera, canvas) => {
+        camera.aspect = canvas.clientWidth / canvas.clientHeight;
+        camera.updateProjectionMatrix();
+    });
 
     const scene = new THREE.Scene();
 
@@ -243,18 +264,38 @@ function init() {
         }
     });
 
-    resizeToDisplaySize(renderer, camera);
+    const overlay = new THREE.Scene();
+    {
+        const gltf = assets.crosshair;
+        gltf.scene.rotateX(Math.PI / 2);
+        gltf.scene.scale.multiplyScalar(1.5);
+        overlay.add(gltf.scene);
+    }
+
+    const overlayCamera = new THREE.OrthographicCamera();
+    cameraManager.addCamera(overlayCamera, (camera, canvas) => {
+        const divisor = Math.min(canvas.width, canvas.height);
+        camera.top = canvas.height / divisor;
+        camera.bottom = - canvas.height / divisor;
+        camera.left = - canvas.width / divisor;
+        camera.right = canvas.width / divisor;
+        camera.near = -1;
+        camera.far = 1;
+        camera.updateProjectionMatrix();
+    });
+
+    cameraManager.resizeToDisplaySize(renderer, canvas);
 
     const composer = new EffectComposer(renderer);
-    const renderPass =new RenderPass(scene, camera);
-    const outlinePass = new OutlinePass(new THREE.Vector2(canvas.innerWidth, canvas.innerHeight), scene, camera);
+    const renderPass = new RenderPass(scene, camera);
+    const outlinePass = new OutlinePass(new THREE.Vector2(canvas.width, canvas.height), scene, camera);
     composer.addPass(renderPass);
     composer.addPass(outlinePass);
 
     function render(time) {
         time *= 0.001;
 
-        resizeToDisplaySize(renderer, camera);
+        cameraManager.resizeToDisplaySize(renderer, canvas);
 
         raycaster.setFromCamera(pointer, camera);
         const intersects = raycaster.intersectObjects(menu_cubes, false);
@@ -269,7 +310,10 @@ function init() {
             outlinePass.selectedObjects = [];
         }
 
+        renderer.clear();
         composer.render();
+        renderer.clearDepth();
+        renderer.render(overlay, overlayCamera);
 
         requestAnimationFrame(render);
     }
