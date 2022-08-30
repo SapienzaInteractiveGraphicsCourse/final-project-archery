@@ -3,6 +3,8 @@
 import * as THREE from 'three';
 import {OrbitControls} from './examples/jsm/controls/OrbitControls.js';
 import {GLTFLoader} from './examples/jsm/loaders/GLTFLoader.js';
+import * as SkeletonUtils from './examples/jsm/utils/SkeletonUtils.js';
+
 import {EffectComposer} from './examples/jsm/postprocessing/EffectComposer.js';
 import {RenderPass} from './examples/jsm/postprocessing/RenderPass.js';
 import {OutlinePass} from './examples/jsm/postprocessing/OutlinePass.js';
@@ -139,12 +141,15 @@ function init() {
     }
 
     const menu_cubes = [
-        makeMenuCube(geometry, 8, 1.5, assets.menu1),
-        makeMenuCube(geometry, 8, 0, assets.menu2),
-        makeMenuCube(geometry, 8, -1.5, assets.menu3),
+        makeMenuCube(geometry, 4, 1.5, assets.menu1),
+        makeMenuCube(geometry, 4, 0, assets.menu2),
+        makeMenuCube(geometry, 4, -1.5, assets.menu3),
     ];
 
-    scene.background = assets.skybox_forest;
+    for(var i = 0; i < menu_cubes.length; i++) menu_cubes[i].userData.idx = i;
+    menu_cubes[0].userData.skybox = assets.skybox_forest;
+    menu_cubes[1].userData.skybox = assets.skybox_sky;
+    menu_cubes[2].userData.skybox = assets.skybox_lava;
 
     //ARCO
 
@@ -168,32 +173,48 @@ function init() {
         scene.add( gltf.scene );
     }
 
+    const levels = [];
+
     //target0
     {
         const gltf = assets.target0;
-        gltf.scene.children[0].position.z=-24;
-        scene.add( gltf.scene );
+        const scene = SkeletonUtils.clone(gltf.scene);
+        const obj = new THREE.Object3D();
+        obj.position.z=-24;
+        obj.add(scene);
+
+        levels.push(obj);
     }
 
     //target1
     {
         const gltf = assets.target1;
-        gltf.scene.children[0].scale.multiplyScalar(0.3);
-        gltf.scene.children[0].position.z=-10;
-        gltf.scene.children[0].position.x=7;
+        const scene = SkeletonUtils.clone(gltf.scene);
+        const obj = new THREE.Object3D();
+        obj.scale.multiplyScalar(0.3);
+        obj.position.z=-10;
+        obj.position.x=7;
+        obj.add(scene);
 
-        scene.add( gltf.scene );
+        levels.push(obj);
     }
 
     //target2
     {
         const gltf = assets.target2;
-        gltf.scene.children[0].scale.multiplyScalar(0.1);
-        gltf.scene.children[0].position.z=-10;
-        gltf.scene.children[0].position.x=-7;
+        const scene = SkeletonUtils.clone(gltf.scene);
+        const obj = new THREE.Object3D();
+        obj.scale.multiplyScalar(0.1);
+        obj.position.z=-10;
+        obj.position.x=-7;
+        obj.add(scene);
 
-        scene.add( gltf.scene );
+        levels.push(obj);
     }
+
+    let current_level = 0;
+    scene.add(levels[0]);
+    scene.background = assets.skybox_forest;
 
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
@@ -207,7 +228,14 @@ function init() {
 
     document.addEventListener('mouseup', () => {
         if(selected_menu !== undefined) {
-            console.log('Level change');
+            const {idx, skybox} = selected_menu.userData;
+            console.log(`Level change to ${idx}`);
+
+            scene.remove(levels[current_level]);
+            scene.add(levels[idx]);
+            current_level = idx;
+
+            scene.background = skybox;
         }
     });
 
