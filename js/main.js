@@ -51,7 +51,6 @@ const assets = {
     target3: {url: "/assets/targets/poster_target.glb", loader: "gltf"},
     target4: {url: "/assets/targets/scarecrow_target.glb", loader: "gltf"},
     target5: {url: "/assets/targets/scarecrow_target2.glb", loader: "gltf"},
-
     skybox_forest: {
         url: [
             '/assets/skybox_images/forest-x.png',
@@ -162,7 +161,7 @@ function init() {
     const boxDepth = 1;
     const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
-    function makeMenuCube(geometry, x, y,z, map) {
+    function makeMenuCube(geometry, x, y, z, map) {
         const material = new THREE.MeshPhongMaterial({map});
         const cube = new THREE.Mesh(geometry, material);
         cube.position.set(x, y, z);
@@ -172,9 +171,9 @@ function init() {
     }
 
     const menu_cubes = [
-        makeMenuCube(geometry, 15, 1.5,-10, assets.menu1),
-        makeMenuCube(geometry, 15, 0, -10,assets.menu2),
-        makeMenuCube(geometry, 15, -1.5,-10, assets.menu3),
+        makeMenuCube(geometry, 15, 1.5, -10, assets.menu1),
+        makeMenuCube(geometry, 15, 0, -10, assets.menu2),
+        makeMenuCube(geometry, 15, -1.5, -10, assets.menu3),
     ];
 
     for(var i = 0; i < menu_cubes.length; i++) menu_cubes[i].userData.idx = i;
@@ -206,106 +205,38 @@ function init() {
 
     const levels = [];
 
-    //target0
-    {
-        const gltf = assets.target0;
-        const scene = SkeletonUtils.clone(gltf.scene);
+    function addObject(level, gltf, x, y, z, scale = 1) {
         const obj = new THREE.Object3D();
-        obj.position.z=-30;
-        obj.position.y=20;
-        obj.add(scene);
-        //
-        levels.push(obj);//0
-        levels.push(obj);//1
-        //levels.push(obj);
+        obj.position.set(x, y, z);
+        obj.scale.multiplyScalar(scale);
+        obj.add(SkeletonUtils.clone(gltf.scene));
+        level.add(obj);
     }
 
-    //target1
-    {
-        const gltf = assets.target1;
-        const scene = SkeletonUtils.clone(gltf.scene);
-        const obj = new THREE.Object3D();
-        obj.scale.multiplyScalar(0.3);
-        obj.position.z=-30;
-        obj.position.x=25;
-        obj.add(scene);
+    // level 1
+    const level1 = new THREE.Object3D();
+    addObject(level1, assets.target0, 0, 20, -30);
+    addObject(level1, assets.target1, 25, 0, -30, 0.3);
+    addObject(level1, assets.target2, -30, 0, -30, 0.1);
+    addObject(level1, assets.target0, 0, 0, -30);
+    levels.push(level1);
 
-        levels.push(obj);//2
-        levels.push(obj);//3
-        //levels.push(obj);
-    }
+    // level 2
+    console.log(level1);
+    const level2 = level1.clone();
+    addObject(level2, assets.target4, -10, 10, -20, 4.95);
+    levels.push(level2);
 
-    //target2
-    {
-        const gltf = assets.target2;
-        const scene = SkeletonUtils.clone(gltf.scene);
-        const obj = new THREE.Object3D();
-        obj.scale.multiplyScalar(0.1);
-        obj.position.z=-30;
-        obj.position.x=-30;
-        obj.add(scene);
-
-        levels.push(obj);//4
-        levels.push(obj);//5
-        //levels.push(obj);
-    }
-
-        //scarecrow
-{
-    const gltf = assets.target4;
-    const scene = SkeletonUtils.clone(gltf.scene);
-    const obj = new THREE.Object3D();
-    obj.scale.multiplyScalar(4.95);
-    obj.position.y=10;
-    obj.position.x=-10;
-    obj.position.z=-20;
-
-    obj.add(scene);
-
-    levels.push(obj);//6
-    levels.push(obj);//7
-    //levels.push(obj);
-}
-
-//target0 bis
-{
-    const gltf = assets.target0;
-    const scene = SkeletonUtils.clone(gltf.scene);
-    const obj = new THREE.Object3D();
-    obj.position.z=-30;
-    obj.position.x=0;
-    obj.add(scene);
-
-    levels.push(obj);//8
-    levels.push(obj);//9
-}
-//poster target
-{
-    const gltf = assets.target3;
-    const scene = SkeletonUtils.clone(gltf.scene);
-    const obj = new THREE.Object3D();
-    obj.scale.multiplyScalar(3.95);
-
-    obj.position.z=-20;
-    obj.position.x=10;
-    obj.add(scene);
-
-    levels.push(obj);//10
-    levels.push(obj);//11
-}
-
-
+    // level 3
+    const level3 = level2.clone();
+    addObject(level3, assets.target3, 10, 0, -20, 3.95);
+    levels.push(level3);
 
 
     let current_level = 0;
     scene.add(levels[0]);
-    scene.add(levels[2]);
-    scene.add(levels[4]);
-    scene.add(levels[8]);
-
-
-
     scene.background = assets.skybox_forest;
+
 
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
@@ -322,22 +253,10 @@ function init() {
             const {idx, skybox} = selected_menu.userData;
             console.log(`Level change to ${idx}`);
 
-            scene.remove(levels[10]);
-            scene.remove(levels[6]);
-            if(idx != 0){
-                scene.add(levels[6]);
-                if(idx == 2){
-                    scene.add(levels[10]);
-                }
-                //scaregrow
-            }
-            scene.add(levels[0]);
-            scene.add(levels[2]);
-            scene.add(levels[4]);
-            scene.add(levels[8]);
-
-            //scene.add(levels[idx+7]);
+            scene.remove(levels[current_level]);
+            scene.add(levels[idx]);
             current_level = idx;
+
             scene.background = skybox;
         }
     });
