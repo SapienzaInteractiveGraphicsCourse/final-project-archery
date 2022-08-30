@@ -3,17 +3,20 @@
 import * as THREE from 'three';
 import {OrbitControls} from './examples/jsm/controls/OrbitControls.js';
 import {GLTFLoader} from './examples/jsm/loaders/GLTFLoader.js';
+import {EffectComposer} from './examples/jsm/postprocessing/EffectComposer.js';
+import {RenderPass} from './examples/jsm/postprocessing/RenderPass.js';
+import {OutlinePass} from './examples/jsm/postprocessing/OutlinePass.js';
 
-
-function resizeRendererToDisplaySize(/**@type THREE.WebGLRenderer*/ renderer) {
+function resizeToDisplaySize(/**@type THREE.WebGLRenderer*/ renderer, camera) {
     const canvas = renderer.domElement;
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
+
     if(canvas.width !== width || canvas.height !== height) {
         renderer.setSize(width, height, false);
-        return true;
+        camera.aspect = canvas.clientWidth / canvas.clientHeight;
+        camera.updateProjectionMatrix();
     }
-    return false;
 }
 
 const assets = {
@@ -207,29 +210,33 @@ function init() {
         }
     });
 
+    resizeToDisplaySize(renderer, camera);
+
+    const composer = new EffectComposer(renderer);
+    const renderPass =new RenderPass(scene, camera);
+    const outlinePass = new OutlinePass(new THREE.Vector2(canvas.innerWidth, canvas.innerHeight), scene, camera);
+    composer.addPass(renderPass);
+    composer.addPass(outlinePass);
+
     function render(time) {
         time *= 0.001;
 
-        if(resizeRendererToDisplaySize(renderer)) {
-            const canvas = renderer.domElement;
-            camera.aspect = canvas.clientWidth / canvas.clientHeight;
-            camera.updateProjectionMatrix();
-        }
+        resizeToDisplaySize(renderer, camera);
 
         raycaster.setFromCamera(pointer, camera);
         const intersects = raycaster.intersectObjects(menu_cubes, false);
 
-        if(selected_menu !== undefined) {
-            selected_menu.material.emissive.setRGB(0,0,0);
-        }
         if(intersects.length > 0) {
             const new_cube = intersects[0].object;
-            new_cube.material.emissive.setRGB(0,10,10);
             selected_menu = new_cube;
+            outlinePass.selectedObjects = [selected_menu];
         }
-        else selected_menu = undefined;
+        else {
+            selected_menu = undefined;
+            outlinePass.selectedObjects = [];
+        }
 
-        renderer.render(scene, camera);
+        composer.render();
 
         requestAnimationFrame(render);
     }
