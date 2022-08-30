@@ -25,6 +25,7 @@ const assets = {
     menu3: {url: "/assets/menu/3.jpeg", loader: "texture"},
     bow: {url: "/assets/simple_bow.glb", loader: "gltf"},
     arrow: {url: "/assets/arrow.glb", loader: "gltf"},
+    crosshair: {url: "/assets/crosshair.glb", loader: "gltf"},
     target0: {url: "/assets/targets/archery_target.glb", loader: "gltf"},
     target1: {url: "/assets/targets/target.glb", loader: "gltf"},
     target2: {url: "/assets/targets/bullseye_target_custom_ue4_collison_included.glb", loader: "gltf"},
