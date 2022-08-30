@@ -2,6 +2,8 @@
 
 import * as THREE from 'three';
 import {OrbitControls} from './examples/jsm/controls/OrbitControls.js';
+import {PointerLockControls} from './examples/jsm/controls/PointerLockControls.js';
+
 import {GLTFLoader} from './examples/jsm/loaders/GLTFLoader.js';
 import * as SkeletonUtils from './examples/jsm/utils/SkeletonUtils.js';
 
@@ -125,6 +127,8 @@ function init() {
     const controls = new OrbitControls(camera, canvas);
     controls.target.set(0, 0, 0);
     controls.update();
+    // const controls = new PointerLockControls(camera, canvas);
+    // document.addEventListener('click', () => controls.lock());
 
     const boxWidth = 1;
     const boxHeight = 1;
