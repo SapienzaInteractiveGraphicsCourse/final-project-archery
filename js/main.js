@@ -91,7 +91,7 @@ function main() {
     for(const asset of Object.values(assets)) {
         const loader = loaders[asset.loader];
         if(loader) {
-            loader.load(asset.url, (result) => asset.result = result, undefined, error => console.error(error));
+            loader.load(asset.url, result => asset.result = result, undefined, error => console.error(error));
         }
         else console.error(`Invalid loader ${asset.loader} for asset ${asset.url}`);
     }
