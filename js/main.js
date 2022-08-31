@@ -1,6 +1,7 @@
 'use strict';
 
 import * as THREE from 'three';
+import * as TWEEN from 'tween';
 import {OrbitControls} from './examples/jsm/controls/OrbitControls.js';
 import {PointerLockControls} from './examples/jsm/controls/PointerLockControls.js';
 
@@ -293,6 +294,8 @@ function init() {
         time *= 0.001;
 
         cameraManager.resizeToDisplaySize(renderer, canvas);
+
+        TWEEN.update();
 
         raycaster.setFromCamera(pointer, camera);
         const intersects = raycaster.intersectObjects(menu_cubes, false);
