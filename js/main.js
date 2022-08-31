@@ -151,11 +151,11 @@ function init() {
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
-    const controls = new OrbitControls(camera, canvas);
-    controls.target.set(0, 0, 0);
-    controls.update();
-    // const controls = new PointerLockControls(camera, canvas);
-    // document.addEventListener('click', () => controls.lock());
+    // const controls = new OrbitControls(camera, canvas);
+    // controls.target.set(0, 0, 0);
+    // controls.update();
+    const controls = new PointerLockControls(camera, canvas);
+    document.addEventListener('click', () => controls.lock());
 
     const boxWidth = 1;
     const boxHeight = 1;
@@ -240,12 +240,6 @@ function init() {
 
 
     const raycaster = new THREE.Raycaster();
-    const pointer = new THREE.Vector2();
-
-    document.addEventListener('mousemove', event => {
-        pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-        pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
-    });
 
     let selected_menu;
 
@@ -297,7 +291,7 @@ function init() {
 
         TWEEN.update();
 
-        raycaster.setFromCamera(pointer, camera);
+        raycaster.setFromCamera({x: 0, y: 0}, camera);
         const intersects = raycaster.intersectObjects(menu_cubes, false);
 
         if(intersects.length > 0) {
