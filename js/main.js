@@ -187,19 +187,20 @@ function init() {
     {
         const gltf = assets.bow;
         gltf.scene.children[0].scale.multiplyScalar(0.1);
-        gltf.scene.children[0].position.z=3;
-        gltf.scene.children[0].rotation.y=-12.55;
-        gltf.scene.children[0].rotation.z=-1.7;
+        gltf.scene.children[0].position.z = 3;
+        gltf.scene.children[0].rotation.z = -Math.PI / 2;
         scene.add(gltf.scene);
     }
 
     //arrow
+    let arrow;
     {
         const gltf = assets.arrow;
         gltf.scene.children[0].scale.multiplyScalar(0.03);
         gltf.scene.children[0].position.z=2.2;
         //gltf.scene.children[0].rotation.y=-12.55;
         //gltf.scene.children[0].rotation.z=-1.7;
+        arrow = gltf.scene.children[0];
 
         scene.add( gltf.scene );
     }
@@ -254,6 +255,19 @@ function init() {
 
             scene.background = skybox;
         }
+
+        const worldPosition = new THREE.Vector3();
+        const WorldDirection = new THREE.Vector3();
+        camera.getWorldPosition(worldPosition);
+        camera.getWorldDirection(WorldDirection);
+
+        const ray = new THREE.Ray(worldPosition, WorldDirection);
+        ray.recast(20);
+
+        const tween = new TWEEN.Tween(arrow.position);
+        tween.to({x: ray.origin.x, y: ray.origin.y, z: ray.origin.z}, 2000);
+        tween.chain(new TWEEN.Tween(arrow.position).to({x: 0, y: 0, z: 2.2}, 1))
+        tween.start();
     });
 
     const overlay = new THREE.Scene();
