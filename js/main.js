@@ -190,6 +190,24 @@ function init() {
         gltf.scene.children[0].position.z = 3;
         gltf.scene.children[0].rotation.z = -Math.PI / 2;
         scene.add(gltf.scene);
+
+        controls.addEventListener('change', () => {
+            const worldDirection = new THREE.Vector3();
+            camera.getWorldDirection(worldDirection);
+            worldDirection.normalize();
+
+            const baseDirection = new THREE.Vector3(0, 0, -1);
+
+            const quat = new THREE.Quaternion();
+            quat.setFromUnitVectors(baseDirection, worldDirection);
+
+            const euler = new THREE.Euler();
+            euler.setFromQuaternion(quat);
+
+            gltf.scene.children[0].rotation.x = euler.x - Math.PI / 2;
+            gltf.scene.children[0].rotation.y = euler.y;
+            gltf.scene.children[0].rotation.z = euler.z - Math.PI / 2;
+        });
     }
 
     //arrow
