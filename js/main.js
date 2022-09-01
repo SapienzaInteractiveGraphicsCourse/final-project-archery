@@ -187,26 +187,25 @@ function init() {
     {
         const gltf = assets.bow;
         gltf.scene.children[0].scale.multiplyScalar(0.1);
-        gltf.scene.children[0].position.z = 3;
+        gltf.scene.children[0].position.z = 3.7;
         gltf.scene.children[0].rotation.z = -Math.PI / 2;
         scene.add(gltf.scene);
 
         controls.addEventListener('change', () => {
+            const worldPosition = new THREE.Vector3();
             const worldDirection = new THREE.Vector3();
+            camera.getWorldPosition(worldPosition);
             camera.getWorldDirection(worldDirection);
-            worldDirection.normalize();
 
-            const baseDirection = new THREE.Vector3(0, 0, -1);
+            const ray = new THREE.Ray(worldPosition, worldDirection);
+            ray.recast(5);
 
-            const quat = new THREE.Quaternion();
-            quat.setFromUnitVectors(baseDirection, worldDirection);
+            // Translate bow a bit to the left relative to the camera,
+            // to avoid it covering the view
+            ray.origin.add(ray.direction.cross(camera.up).normalize().multiplyScalar(-0.5));
 
-            const euler = new THREE.Euler();
-            euler.setFromQuaternion(quat);
-
-            gltf.scene.children[0].rotation.x = euler.x - Math.PI / 2;
-            gltf.scene.children[0].rotation.y = euler.y;
-            gltf.scene.children[0].rotation.z = euler.z - Math.PI / 2;
+            gltf.scene.rotation.setFromQuaternion(camera.quaternion);
+            gltf.scene.position.copy(ray.origin);
         });
     }
 
@@ -275,15 +274,15 @@ function init() {
         }
 
         const worldPosition = new THREE.Vector3();
-        const WorldDirection = new THREE.Vector3();
+        const worldDirection = new THREE.Vector3();
         camera.getWorldPosition(worldPosition);
-        camera.getWorldDirection(WorldDirection);
+        camera.getWorldDirection(worldDirection);
 
-        const ray = new THREE.Ray(worldPosition, WorldDirection);
+        const ray = new THREE.Ray(worldPosition, worldDirection);
         ray.recast(20);
 
         const tween = new TWEEN.Tween(arrow.position);
-        tween.to({x: ray.origin.x, y: ray.origin.y, z: ray.origin.z}, 2000);
+        tween.to({x: ray.origin.x, y: ray.origin.y, z: ray.origin.z}, 1000);
         tween.chain(new TWEEN.Tween(arrow.position).to({x: 0, y: 0, z: 2.2}, 1))
         tween.start();
     });
