@@ -91,12 +91,14 @@ function main() {
     const manager = new THREE.LoadingManager();
     const loadingScreen = document.querySelector("#loadingscreen");
     const progressBar = document.querySelector("#progressbar");
+    const infoOverlay = document.querySelector("#info");
 
     manager.onLoad = () => {
         const keys = Object.keys(assets);
         for(const key of keys) {
             assets[key] = assets[key].result;
         }
+        infoOverlay.style.display = '';
         loadingScreen.style.display = 'none';
         init();
     };
@@ -155,7 +157,11 @@ function init() {
     // controls.target.set(0, 0, 0);
     // controls.update();
     const controls = new PointerLockControls(camera, canvas);
-    document.addEventListener('click', () => controls.lock());
+
+    const infoOverlay = document.querySelector("#info");
+    infoOverlay.addEventListener('click', () => controls.lock());
+    controls.addEventListener('lock', () => infoOverlay.style.display = 'none');
+    controls.addEventListener('unlock', () => infoOverlay.style.display = '');
 
     const boxWidth = 1;
     const boxHeight = 1;
@@ -177,7 +183,7 @@ function init() {
         makeMenuCube(geometry, 15, -1.5, -10, assets.menu3),
     ];
 
-    for(var i = 0; i < menu_cubes.length; i++) menu_cubes[i].userData.idx = i;
+    for(let i = 0; i < menu_cubes.length; i++) menu_cubes[i].userData.idx = i;
     menu_cubes[0].userData.skybox = assets.skybox_forest;
     menu_cubes[1].userData.skybox = assets.skybox_sky;
     menu_cubes[2].userData.skybox = assets.skybox_lava;
@@ -283,7 +289,7 @@ function init() {
 
         const tween = new TWEEN.Tween(arrow.position);
         tween.to({x: ray.origin.x, y: ray.origin.y, z: ray.origin.z}, 1000);
-        tween.chain(new TWEEN.Tween(arrow.position).to({x: 0, y: 0, z: 2.2}, 1))
+        tween.chain(new TWEEN.Tween(arrow.position).to({x: 0, y: 0, z: 2.2}, 1));
         tween.start();
     });
 

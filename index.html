@@ -57,6 +57,23 @@
                     background-position: 0 0;
                 }
             }
+            #info {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                font-size: xx-large;
+                background-color: rgba(190, 190, 190, 0.3);
+            }
+            #info > div {
+                padding: 2em;
+                background-color: #eee;
+            }
         </style>
     </head>
     <body>
@@ -65,6 +82,11 @@
             <div>
                 <div>Loading...</div>
                 <div id="progress"><div id="progressbar"></div></div>
+            </div>
+        </div>
+        <div id="info", style="display: none;">
+            <div>
+                <div>Click to play</div>
             </div>
         </div>
         <script type="importmap">
