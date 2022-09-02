@@ -7,6 +7,7 @@ import {PointerLockControls} from './examples/jsm/controls/PointerLockControls.j
 
 import {GLTFLoader} from './examples/jsm/loaders/GLTFLoader.js';
 import * as SkeletonUtils from './examples/jsm/utils/SkeletonUtils.js';
+import {ConvexHull} from './examples/jsm/math/ConvexHull.js';
 
 import {EffectComposer} from './examples/jsm/postprocessing/EffectComposer.js';
 import {RenderPass} from './examples/jsm/postprocessing/RenderPass.js';
@@ -229,6 +230,11 @@ function init() {
         obj.position.set(x, y, z);
         obj.scale.multiplyScalar(scale);
         obj.add(SkeletonUtils.clone(gltf.scene));
+
+        const convexHull = new ConvexHull();
+        convexHull.setFromObject(obj);
+        obj.userData.convexHull = convexHull;
+
         level.obstacles.add(obj);
     }
 
@@ -241,12 +247,19 @@ function init() {
 
     // level 2
     const level2 = new Level(2, assets.skybox_sky);
-    level2.obstacles.copy(level1.obstacles);
+    addObstacle(level2, assets.target0, 0, 20, -30);
+    addObstacle(level2, assets.target1, 25, 0, -30, 0.3);
+    addObstacle(level2, assets.target2, -30, 0, -30, 0.1);
+    addObstacle(level2, assets.target0, 0, 0, -30);
     addObstacle(level2, assets.target4, -10, 10, -20, 4.95);
 
     // level 3
     const level3 = new Level(3, assets.skybox_lava);
-    level3.obstacles.copy(level2.obstacles);
+    addObstacle(level3, assets.target0, 0, 20, -30);
+    addObstacle(level3, assets.target1, 25, 0, -30, 0.3);
+    addObstacle(level3, assets.target2, -30, 0, -30, 0.1);
+    addObstacle(level3, assets.target0, 0, 0, -30);
+    addObstacle(level3, assets.target4, -10, 10, -20, 4.95);
     addObstacle(level3, assets.target3, 10, 0, -20, 3.95);
 
 
@@ -279,6 +292,7 @@ function init() {
     const raycaster = new THREE.Raycaster();
 
     let selected_menu;
+    const previousCheckPosition = new THREE.Vector3();
 
     document.addEventListener('mouseup', () => {
         if(selected_menu !== undefined) {
@@ -300,9 +314,11 @@ function init() {
             camera.getWorldDirection(worldDirection);
 
             const ray = new THREE.Ray(worldPosition, worldDirection);
-            ray.recast(20);
+            ray.recast(50);
 
             arrow.inFlight = true;
+            previousCheckPosition.setFromMatrixPosition(arrow.model.matrixWorld);
+
             const tween = new TWEEN.Tween(arrow.model.position);
             tween.to({x: ray.origin.x, y: ray.origin.y, z: ray.origin.z}, 1000);
             tween.chain(
@@ -317,6 +333,45 @@ function init() {
             tween.start();
         }
     });
+
+    function makeSegmentRays(/**@type THREE.Vector3 */ a, /**@type THREE.Vector3 */ b) {
+        return {
+            forward: new THREE.Ray(a, b.clone().sub(a).normalize()),
+            backward: new THREE.Ray(b, a.clone().sub(b).normalize())
+        };
+    }
+
+    // Since the targets are thin, simply checking that the arrow intersects
+    // their convex hull isn't sufficient: the arrow could go from one side
+    // of the target to the other in a single frame.
+    // Instead, check for intersection between the convex hull and the segment
+    // connecting the arrow's position in the previous frame and the current
+    // position.
+    // ConvexHull only supports ray intersection, so to check for segment
+    // intersection verify that both the A->B and B->A rays intersect with the
+    // hull.
+    function checkArrowCollision() {
+        const {arrow} = gameObjects;
+        if(!arrow.inFlight) {
+            return;
+        }
+        // TODO inverse obstacle transform
+
+        arrow.model.updateMatrixWorld();
+        const arrowPos = new THREE.Vector3();
+        arrowPos.setFromMatrixPosition(arrow.model.matrixWorld);
+
+        const {forward, backward} = makeSegmentRays(previousCheckPosition, arrowPos);
+
+        for(const obstacle of current_level.obstacles.children) {
+            const convexHull = obstacle.userData.convexHull;
+            if(convexHull.intersectsRay(forward) && convexHull.intersectsRay(backward)) {
+                console.log('Boom');
+            }
+        }
+
+        previousCheckPosition.setFromMatrixPosition(arrow.model.matrixWorld);
+    }
 
     const overlay = new THREE.Scene();
     {
@@ -353,6 +408,9 @@ function init() {
         cameraManager.resizeToDisplaySize(renderer, canvas);
 
         TWEEN.update();
+        current_level.animationGroup.update();
+
+        checkArrowCollision();
 
         raycaster.setFromCamera({x: 0, y: 0}, camera);
         const intersects = raycaster.intersectObjects(menu_cubes, false);
