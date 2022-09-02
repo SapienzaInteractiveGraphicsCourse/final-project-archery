@@ -39,6 +39,15 @@ class CameraManager {
     }
 }
 
+class Level {
+    constructor(levelId, skybox) {
+        this.levelId = levelId;
+        this.animationGroup = new TWEEN.Group();
+        this.obstacles = new THREE.Object3D();
+        this.skybox = skybox;
+    }
+}
+
 const assets = {
     menu1: {url: "/assets/menu/1.jpeg", loader: "texture"},
     menu2: {url: "/assets/menu/2.jpeg", loader: "texture"},
@@ -163,31 +172,6 @@ function init() {
     controls.addEventListener('lock', () => infoOverlay.style.display = 'none');
     controls.addEventListener('unlock', () => infoOverlay.style.display = '');
 
-    const boxWidth = 1;
-    const boxHeight = 1;
-    const boxDepth = 1;
-    const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
-
-    function makeMenuCube(geometry, x, y, z, map) {
-        const material = new THREE.MeshPhongMaterial({map});
-        const cube = new THREE.Mesh(geometry, material);
-        cube.position.set(x, y, z);
-
-        scene.add(cube);
-        return cube;
-    }
-
-    const menu_cubes = [
-        makeMenuCube(geometry, 15, 1.5, -10, assets.menu1),
-        makeMenuCube(geometry, 15, 0, -10, assets.menu2),
-        makeMenuCube(geometry, 15, -1.5, -10, assets.menu3),
-    ];
-
-    for(let i = 0; i < menu_cubes.length; i++) menu_cubes[i].userData.idx = i;
-    menu_cubes[0].userData.skybox = assets.skybox_forest;
-    menu_cubes[1].userData.skybox = assets.skybox_sky;
-    menu_cubes[2].userData.skybox = assets.skybox_lava;
-
     //ARCO
 
     {
@@ -228,39 +212,56 @@ function init() {
         scene.add( gltf.scene );
     }
 
-    const levels = [];
-
-    function addObject(level, gltf, x, y, z, scale = 1) {
+    function addObstacle(level, gltf, x, y, z, scale = 1) {
         const obj = new THREE.Object3D();
         obj.position.set(x, y, z);
         obj.scale.multiplyScalar(scale);
         obj.add(SkeletonUtils.clone(gltf.scene));
-        level.add(obj);
+        level.obstacles.add(obj);
     }
 
     // level 1
-    const level1 = new THREE.Object3D();
-    addObject(level1, assets.target0, 0, 20, -30);
-    addObject(level1, assets.target1, 25, 0, -30, 0.3);
-    addObject(level1, assets.target2, -30, 0, -30, 0.1);
-    addObject(level1, assets.target0, 0, 0, -30);
-    levels.push(level1);
+    const level1 = new Level(1, assets.skybox_forest);
+    addObstacle(level1, assets.target0, 0, 20, -30);
+    addObstacle(level1, assets.target1, 25, 0, -30, 0.3);
+    addObstacle(level1, assets.target2, -30, 0, -30, 0.1);
+    addObstacle(level1, assets.target0, 0, 0, -30);
 
     // level 2
-    console.log(level1);
-    const level2 = level1.clone();
-    addObject(level2, assets.target4, -10, 10, -20, 4.95);
-    levels.push(level2);
+    const level2 = new Level(2, assets.skybox_sky);
+    level2.obstacles.copy(level1.obstacles);
+    addObstacle(level2, assets.target4, -10, 10, -20, 4.95);
 
     // level 3
-    const level3 = level2.clone();
-    addObject(level3, assets.target3, 10, 0, -20, 3.95);
-    levels.push(level3);
+    const level3 = new Level(3, assets.skybox_lava);
+    level3.obstacles.copy(level2.obstacles);
+    addObstacle(level3, assets.target3, 10, 0, -20, 3.95);
 
 
-    let current_level = 0;
-    scene.add(levels[0]);
-    scene.background = assets.skybox_forest;
+    let current_level = level1;
+    scene.add(level1.obstacles);
+    scene.background = level1.skybox;
+
+
+    const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+
+    function makeMenuCube(cubeGeometry, x, y, z, map) {
+        const material = new THREE.MeshPhongMaterial({map});
+        const cube = new THREE.Mesh(cubeGeometry, material);
+        cube.position.set(x, y, z);
+
+        scene.add(cube);
+        return cube;
+    }
+
+    const menu_cubes = [
+        makeMenuCube(cubeGeometry, 15, 1.5, -10, assets.menu1),
+        makeMenuCube(cubeGeometry, 15, 0, -10, assets.menu2),
+        makeMenuCube(cubeGeometry, 15, -1.5, -10, assets.menu3),
+    ];
+    menu_cubes[0].userData.level = level1;
+    menu_cubes[1].userData.level = level2;
+    menu_cubes[2].userData.level = level3;
 
 
     const raycaster = new THREE.Raycaster();
@@ -269,14 +270,14 @@ function init() {
 
     document.addEventListener('mouseup', () => {
         if(selected_menu !== undefined) {
-            const {idx, skybox} = selected_menu.userData;
-            console.log(`Level change to ${idx}`);
+            const {level} = selected_menu.userData;
+            console.log(`Level change to ${level.levelId}`);
 
-            scene.remove(levels[current_level]);
-            scene.add(levels[idx]);
-            current_level = idx;
+            scene.remove(current_level.obstacles);
+            scene.add(level.obstacles);
+            scene.background = level.skybox;
 
-            scene.background = skybox;
+            current_level = level;
         }
 
         const worldPosition = new THREE.Vector3();
