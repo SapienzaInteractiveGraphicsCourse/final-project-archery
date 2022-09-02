@@ -48,6 +48,14 @@ class Level {
     }
 }
 
+class Arrow {
+    constructor(model) {
+        this.model = model;
+        this.inFlight = false;
+        this.tween = null;
+    }
+}
+
 const assets = {
     menu1: {url: "/assets/menu/1.jpeg", loader: "texture"},
     menu2: {url: "/assets/menu/2.jpeg", loader: "texture"},
@@ -172,8 +180,7 @@ function init() {
     controls.addEventListener('lock', () => infoOverlay.style.display = 'none');
     controls.addEventListener('unlock', () => infoOverlay.style.display = '');
 
-    //ARCO
-
+    const gameObjects = {};
     {
         const gltf = assets.bow;
         gltf.scene.children[0].scale.multiplyScalar(0.1);
@@ -181,36 +188,41 @@ function init() {
         gltf.scene.children[0].rotation.z = -Math.PI / 2;
         scene.add(gltf.scene);
 
-        controls.addEventListener('change', () => {
-            const worldPosition = new THREE.Vector3();
-            const worldDirection = new THREE.Vector3();
-            camera.getWorldPosition(worldPosition);
-            camera.getWorldDirection(worldDirection);
-
-            const ray = new THREE.Ray(worldPosition, worldDirection);
-            ray.recast(5);
-
-            // Translate bow a bit to the left relative to the camera,
-            // to avoid it covering the view
-            ray.origin.add(ray.direction.cross(camera.up).normalize().multiplyScalar(-0.5));
-
-            gltf.scene.rotation.setFromQuaternion(camera.quaternion);
-            gltf.scene.position.copy(ray.origin);
-        });
+        gameObjects.bow = gltf.scene;
     }
-
-    //arrow
-    let arrow;
     {
         const gltf = assets.arrow;
         gltf.scene.children[0].scale.multiplyScalar(0.03);
-        gltf.scene.children[0].position.z=2.2;
-        //gltf.scene.children[0].rotation.y=-12.55;
-        //gltf.scene.children[0].rotation.z=-1.7;
-        arrow = gltf.scene.children[0];
+        gltf.scene.children[0].position.z = 3;
+        scene.add(gltf.scene);
 
-        scene.add( gltf.scene );
+        gameObjects.arrow = new Arrow(gltf.scene);
     }
+
+    function updateFirstPersonObjects() {
+        const worldPosition = new THREE.Vector3();
+        const worldDirection = new THREE.Vector3();
+        camera.getWorldPosition(worldPosition);
+        camera.getWorldDirection(worldDirection);
+
+        const ray = new THREE.Ray(worldPosition, worldDirection);
+        ray.recast(5);
+
+        // Translate bow a bit to the left relative to the camera,
+        // to avoid it covering the view
+        ray.origin.add(ray.direction.cross(camera.up).normalize().multiplyScalar(-0.5));
+
+        const {bow, arrow} = gameObjects;
+        bow.rotation.setFromQuaternion(camera.quaternion);
+        bow.position.copy(ray.origin);
+
+        if(!arrow.inFlight) {
+            arrow.model.rotation.setFromQuaternion(camera.quaternion);
+            arrow.model.position.copy(bow.position);
+        }
+    }
+    controls.addEventListener('change', updateFirstPersonObjects);
+
 
     function addObstacle(level, gltf, x, y, z, scale = 1) {
         const obj = new THREE.Object3D();
@@ -280,18 +292,30 @@ function init() {
             current_level = level;
         }
 
-        const worldPosition = new THREE.Vector3();
-        const worldDirection = new THREE.Vector3();
-        camera.getWorldPosition(worldPosition);
-        camera.getWorldDirection(worldDirection);
+        const {arrow} = gameObjects;
+        if(!arrow.inFlight) {
+            const worldPosition = new THREE.Vector3();
+            const worldDirection = new THREE.Vector3();
+            camera.getWorldPosition(worldPosition);
+            camera.getWorldDirection(worldDirection);
 
-        const ray = new THREE.Ray(worldPosition, worldDirection);
-        ray.recast(20);
+            const ray = new THREE.Ray(worldPosition, worldDirection);
+            ray.recast(20);
 
-        const tween = new TWEEN.Tween(arrow.position);
-        tween.to({x: ray.origin.x, y: ray.origin.y, z: ray.origin.z}, 1000);
-        tween.chain(new TWEEN.Tween(arrow.position).to({x: 0, y: 0, z: 2.2}, 1));
-        tween.start();
+            arrow.inFlight = true;
+            const tween = new TWEEN.Tween(arrow.model.position);
+            tween.to({x: ray.origin.x, y: ray.origin.y, z: ray.origin.z}, 1000);
+            tween.chain(
+                new TWEEN.Tween(arrow.model.position)
+                    .to({x: 0, y: 0, z: 2.2}, 1)
+                    .onComplete(() => {
+                        arrow.inFlight = false;
+                        arrow.model.rotation.copy(gameObjects.bow.rotation);
+                        arrow.model.position.copy(gameObjects.bow.position);
+                    })
+            );
+            tween.start();
+        }
     });
 
     const overlay = new THREE.Scene();
@@ -315,6 +339,7 @@ function init() {
     });
 
     cameraManager.resizeToDisplaySize(renderer, canvas);
+    updateFirstPersonObjects();
 
     const composer = new EffectComposer(renderer);
     const renderPass = new RenderPass(scene, camera);
