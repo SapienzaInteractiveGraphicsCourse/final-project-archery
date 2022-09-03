@@ -57,6 +57,26 @@ class Arrow {
     }
 }
 
+class CollidableObject extends THREE.Object3D {
+    constructor() {
+        super();
+        this.onCollisionHandler = () => {};
+    }
+    prepare() {
+        const convexHull = new ConvexHull();
+        convexHull.setFromObject(this);
+        this.userData.convexHull = convexHull;
+
+        this.updateMatrixWorld();
+        this.userData.originalPosition = new THREE.Vector3();
+        this.userData.originalPosition.setFromMatrixPosition(this.matrixWorld);
+    }
+    onCollision(handler) {
+        this.onCollisionHandler = handler;
+        return this;
+    }
+}
+
 const assets = {
     menu1: {url: "/assets/menu/1.jpeg", loader: "texture"},
     menu2: {url: "/assets/menu/2.jpeg", loader: "texture"},
@@ -231,19 +251,16 @@ function init() {
 
 
     function addObstacle(level, gltf, x, y, z, scale = 1) {
-        const obj = new THREE.Object3D();
+        const obj = new CollidableObject().onCollision(obj => {
+            console.log(`Hit obstacle worth ${obj.userData.pointValue} points`);
+        });
         obj.position.set(x, y, z);
         obj.scale.multiplyScalar(scale);
         obj.add(SkeletonUtils.clone(gltf.scene));
 
-        const convexHull = new ConvexHull();
-        convexHull.setFromObject(obj);
-        obj.userData.convexHull = convexHull;
+        obj.userData.pointValue = (Math.random() * 19 + 1) | 0;
 
-        obj.updateMatrixWorld();
-        obj.userData.originalPosition = new THREE.Vector3();
-        obj.userData.originalPosition.setFromMatrixPosition(obj.matrixWorld);
-
+        obj.prepare();
         level.obstacles.add(obj);
     }
 
@@ -280,12 +297,25 @@ function init() {
     const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
 
     function makeMenuCube(cubeGeometry, x, y, z, map) {
+        const obj = new CollidableObject().onCollision(obj => {
+            const {level} = obj.userData;
+            console.log(`Level change to ${level.levelId}`);
+
+            scene.remove(current_level.obstacles);
+            scene.add(level.obstacles);
+            scene.background = level.skybox;
+
+            current_level = level;
+        });
+
         const material = new THREE.MeshPhongMaterial({map});
         const cube = new THREE.Mesh(cubeGeometry, material);
         cube.position.set(x, y, z);
 
-        scene.add(cube);
-        return cube;
+        obj.add(cube);
+        obj.prepare();
+        scene.add(obj);
+        return obj;
     }
 
     const menu_cubes = [
@@ -304,17 +334,6 @@ function init() {
     const previousCheckPosition = new THREE.Vector3();
 
     document.addEventListener('mouseup', () => {
-        if(selected_menu !== undefined) {
-            const {level} = selected_menu.userData;
-            console.log(`Level change to ${level.levelId}`);
-
-            scene.remove(current_level.obstacles);
-            scene.add(level.obstacles);
-            scene.background = level.skybox;
-
-            current_level = level;
-        }
-
         const {arrow} = gameObjects;
         if(!arrow.inFlight) {
             const worldPosition = new THREE.Vector3();
@@ -359,7 +378,7 @@ function init() {
     // ConvexHull only supports ray intersection, so to check for segment
     // intersection verify that both the A->B and B->A rays intersect with the
     // hull.
-    function checkArrowCollision() {
+    function checkArrowCollision(...targets) {
         const {arrow} = gameObjects;
         if(!arrow.inFlight) {
             return;
@@ -371,21 +390,23 @@ function init() {
 
         const {forward, backward} = makeSegmentRays(previousCheckPosition, arrowPos);
 
-        for(const obstacle of current_level.obstacles.children) {
+        for(const targetGroup of targets) {
+            for(const obstacle of targetGroup) {
 
-            // The convex hulls are computed at obstacle creation, and are not transformed
-            // when animating. To compensate for this, translate the segment in the
-            // opposite direction of the current translation of this obstacle
-            const offset = new THREE.Vector3();
-            offset.setFromMatrixPosition(obstacle.matrixWorld);
-            offset.sub(obstacle.userData.originalPosition);
+                // The convex hulls are computed at obstacle creation, and are not transformed
+                // when animating. To compensate for this, translate the segment in the
+                // opposite direction of the current translation of this obstacle
+                const offset = new THREE.Vector3();
+                offset.setFromMatrixPosition(obstacle.matrixWorld);
+                offset.sub(obstacle.userData.originalPosition);
 
-            const translatedForward = new THREE.Ray(forward.origin.clone().sub(offset), forward.direction);
-            const translatedBackward = new THREE.Ray(backward.origin.clone().sub(offset), backward.direction);
+                const translatedForward = new THREE.Ray(forward.origin.clone().sub(offset), forward.direction);
+                const translatedBackward = new THREE.Ray(backward.origin.clone().sub(offset), backward.direction);
 
-            const convexHull = obstacle.userData.convexHull;
-            if(convexHull.intersectsRay(translatedForward) && convexHull.intersectsRay(translatedBackward)) {
-                console.log('Boom');
+                const convexHull = obstacle.userData.convexHull;
+                if(convexHull.intersectsRay(translatedForward) && convexHull.intersectsRay(translatedBackward)) {
+                    obstacle.onCollisionHandler(obstacle);
+                }
             }
         }
 
@@ -429,10 +450,10 @@ function init() {
         TWEEN.update();
         current_level.animationGroup.update();
 
-        checkArrowCollision();
+        checkArrowCollision(current_level.obstacles.children, menu_cubes);
 
         raycaster.setFromCamera({x: 0, y: 0}, camera);
-        const intersects = raycaster.intersectObjects(menu_cubes, false);
+        const intersects = raycaster.intersectObjects(menu_cubes);
 
         if(intersects.length > 0) {
             const new_cube = intersects[0].object;
