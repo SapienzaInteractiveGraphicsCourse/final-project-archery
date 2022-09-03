@@ -53,6 +53,7 @@ class Arrow {
     constructor(model) {
         this.model = model;
         this.inFlight = false;
+        this.collided = false;
         this.tween = null;
     }
 }
@@ -351,6 +352,7 @@ function init() {
             ray.recast(50);
 
             arrow.inFlight = true;
+            arrow.collided = false;
             previousCheckPosition.setFromMatrixPosition(arrow.model.matrixWorld);
 
             const tween = new TWEEN.Tween(arrow.model.position);
@@ -386,7 +388,7 @@ function init() {
     // hull.
     function checkArrowCollision(...targets) {
         const {arrow} = gameObjects;
-        if(!arrow.inFlight) {
+        if(!arrow.inFlight || arrow.collided) {
             return;
         }
 
@@ -412,6 +414,7 @@ function init() {
                 const convexHull = obstacle.userData.convexHull;
                 if(convexHull.intersectsRay(translatedForward) && convexHull.intersectsRay(translatedBackward)) {
                     obstacle.onCollisionHandler(obstacle);
+                    arrow.collided = true;
                 }
             }
         }
