@@ -130,6 +130,7 @@ function main() {
     const loadingScreen = document.querySelector("#loadingscreen");
     const progressBar = document.querySelector("#progressbar");
     const infoOverlay = document.querySelector("#info");
+    const scoreOverlay = document.querySelector("#score");
 
     manager.onLoad = () => {
         const keys = Object.keys(assets);
@@ -137,6 +138,7 @@ function main() {
             assets[key] = assets[key].result;
         }
         infoOverlay.style.display = '';
+        scoreOverlay.style.display = '';
         loadingScreen.style.display = 'none';
         init();
     };
@@ -249,10 +251,14 @@ function init() {
     }
     controls.addEventListener('change', updateFirstPersonObjects);
 
+    let score = 0;
+    const scoreOverlay = document.querySelector("#score");
 
     function addObstacle(level, gltf, x, y, z, scale = 1) {
         const obj = new CollidableObject().onCollision(obj => {
             console.log(`Hit obstacle worth ${obj.userData.pointValue} points`);
+            score += obj.userData.pointValue;
+            scoreOverlay.innerHTML = score;
         });
         obj.position.set(x, y, z);
         obj.scale.multiplyScalar(scale);
