@@ -61,7 +61,7 @@ const assets = {
     menu1: {url: "/assets/menu/1.jpeg", loader: "texture"},
     menu2: {url: "/assets/menu/2.jpeg", loader: "texture"},
     menu3: {url: "/assets/menu/3.jpeg", loader: "texture"},
-    bow: {url: "/assets/simple_bow.glb", loader: "gltf"},
+    bow: {url: "/assets/bow_divided.glb", loader: "gltf"},
     arrow: {url: "/assets/arrow.glb", loader: "gltf"},
     crosshair: {url: "/assets/crosshair.glb", loader: "gltf"},
     target0: {url: "/assets/targets/archery_target.glb", loader: "gltf"},
@@ -184,12 +184,17 @@ function init() {
     const gameObjects = {};
     {
         const gltf = assets.bow;
-        gltf.scene.children[0].scale.multiplyScalar(0.1);
-        gltf.scene.children[0].position.z = 3.7;
-        gltf.scene.children[0].rotation.z = -Math.PI / 2;
-        scene.add(gltf.scene);
+        console.log(gltf);
+        gltf.scene.scale.multiplyScalar(0.1 * 0.1);
+        gltf.scene.position.z = 3.7;
+        gltf.scene.rotation.z = -Math.PI / 2;
+        gltf.scene.rotation.y = Math.PI / 2;
 
-        gameObjects.bow = gltf.scene;
+        const obj = new THREE.Object3D();
+        obj.add(gltf.scene);
+        scene.add(obj);
+
+        gameObjects.bow = obj;
     }
     {
         const gltf = assets.arrow;
