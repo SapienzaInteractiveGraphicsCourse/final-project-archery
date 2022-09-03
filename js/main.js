@@ -235,6 +235,10 @@ function init() {
         convexHull.setFromObject(obj);
         obj.userData.convexHull = convexHull;
 
+        obj.updateMatrixWorld();
+        obj.userData.originalPosition = new THREE.Vector3();
+        obj.userData.originalPosition.setFromMatrixPosition(obj.matrixWorld);
+
         level.obstacles.add(obj);
     }
 
@@ -355,7 +359,6 @@ function init() {
         if(!arrow.inFlight) {
             return;
         }
-        // TODO inverse obstacle transform
 
         arrow.model.updateMatrixWorld();
         const arrowPos = new THREE.Vector3();
@@ -364,8 +367,19 @@ function init() {
         const {forward, backward} = makeSegmentRays(previousCheckPosition, arrowPos);
 
         for(const obstacle of current_level.obstacles.children) {
+
+            // The convex hulls are computed at obstacle creation, and are not transformed
+            // when animating. To compensate for this, translate the segment in the
+            // opposite direction of the current translation of this obstacle
+            const offset = new THREE.Vector3();
+            offset.setFromMatrixPosition(obstacle.matrixWorld);
+            offset.sub(obstacle.userData.originalPosition);
+
+            const translatedForward = new THREE.Ray(forward.origin.clone().sub(offset), forward.direction);
+            const translatedBackward = new THREE.Ray(backward.origin.clone().sub(offset), backward.direction);
+
             const convexHull = obstacle.userData.convexHull;
-            if(convexHull.intersectsRay(forward) && convexHull.intersectsRay(backward)) {
+            if(convexHull.intersectsRay(translatedForward) && convexHull.intersectsRay(translatedBackward)) {
                 console.log('Boom');
             }
         }
