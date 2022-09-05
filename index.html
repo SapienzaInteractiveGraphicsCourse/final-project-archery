@@ -3,9 +3,9 @@
         <title>Archery</title>
         <style>
             @font-face {
-                    font-family: 'Iam-Hueca' ;
-                    src: local('Iam-Hueca'), url('font.ttf') format('truetype')                }
-                ;
+                font-family: 'Iam-Hueca';
+                src: local('Iam-Hueca'), url('font.ttf') format('truetype');
+            }
             html, body {
                 margin: 0;
                 height: 100%;
@@ -82,25 +82,25 @@
                 position: absolute;
                 left: 0;
                 top: 0;
-                width: 10%;
-                height: 10%;
-                font-size: 22px;
+                font-size: large;
                 color: rgba(255, 255, 255, 0.735);
                 pointer-events: none;
+                align-items: center;
+                justify-content: center;
                 text-align: center;
                 border: 5px solid rgba(255, 255, 255, 0.735);
                 padding: 1.1em;
                 background-image: linear-gradient(top right, #FFFFFF 0%, #AACFEF 100%);
-                font-variant-numeric: oldstyle-nums;
                 font-weight: bold;
             }
-            #zero{
-                float:left;
-                padding-top: 2px;
-                font-size:xx-large;
+            #scorenumber {
+                /* padding-top: 2px; */
+                font-size: xx-large;
             }
-            
-            
+            .scoreimage {
+                width: 2em;
+                height: 2em;
+            }
         </style>
     </head>
     <body>
@@ -120,13 +120,13 @@
             <div>
                 <p>YOUR SCORE IS</p>
             </div>
-            <div style="padding-left: 25%;">
-                <img height="38" width="38" src="target.png"  style="float:left">
-                <div id="zero">0</div>
-                <img height="38" width="38" src="target.png"  style="float:left">
+            <div>
+                <img class="scoreimage" src="target.png">
+                <span id="scorenumber">0</span>
+                <img class="scoreimage" src="target.png">
             </div>
         </div>
-        
+
         <script type="importmap">
         {
             "imports": {
