@@ -259,7 +259,7 @@ function init() {
         const obj = new CollidableObject().onCollision(obj => {
             console.log(`Hit obstacle worth ${obj.userData.pointValue} points`);
             score += obj.userData.pointValue;
-            scoreOverlay.innerHTML = score;
+            scoreOverlay.innerHTML = '<div><p>YOUR SCORE IS</p></div> <div style="padding-left: 23%;"><img height="38" width="38" src="target.png"  style="float:left"><div id="zero">'+score+'</div><img height="38" width="38" src="target.png"  style="float:left"></div>'
         });
         obj.position.set(x, y, z);
         obj.scale.multiplyScalar(scale);
