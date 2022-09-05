@@ -201,6 +201,7 @@ function init() {
 
     const infoOverlay = document.querySelector("#info");
     infoOverlay.addEventListener('click', () => controls.lock());
+    infoOverlay.addEventListener('mouseup', event => event.stopPropagation());
     controls.addEventListener('lock', () => infoOverlay.style.display = 'none');
     controls.addEventListener('unlock', () => infoOverlay.style.display = '');
 
