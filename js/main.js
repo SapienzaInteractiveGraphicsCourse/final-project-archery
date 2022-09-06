@@ -13,6 +13,8 @@ import {EffectComposer} from './examples/jsm/postprocessing/EffectComposer.js';
 import {RenderPass} from './examples/jsm/postprocessing/RenderPass.js';
 import {OutlinePass} from './examples/jsm/postprocessing/OutlinePass.js';
 
+const clamp = (x, a, b) => Math.min(Math.max(x, a), b);
+
 class CameraManager {
     constructor() {
         this.cameras = [];
@@ -198,6 +200,8 @@ function init() {
     // controls.target.set(0, 0, 0);
     // controls.update();
     const controls = new PointerLockControls(camera, canvas);
+    controls.minPolarAngle = 0.1;
+    controls.maxPolarAngle = Math.PI - 0.1;
 
     const infoOverlay = document.querySelector("#info");
     infoOverlay.addEventListener('click', () => controls.lock());
@@ -210,7 +214,7 @@ function init() {
         const gltf = assets.bow;
         console.log(gltf);
         gltf.scene.scale.multiplyScalar(0.1 * 0.1);
-        gltf.scene.position.z = 3.7;
+        gltf.scene.position.z = 2.6;
         gltf.scene.rotation.z = -Math.PI / 2;
         gltf.scene.rotation.y = Math.PI / 2;
 
@@ -223,7 +227,6 @@ function init() {
     {
         const gltf = assets.arrow;
         gltf.scene.children[0].scale.multiplyScalar(0.03);
-        gltf.scene.children[0].position.z = 3;
         scene.add(gltf.scene);
 
         gameObjects.arrow = new Arrow(gltf.scene);
@@ -278,6 +281,70 @@ function init() {
     addObstacle(level1, assets.target1, 25, 0, -30, 0.3);
     addObstacle(level1, assets.target2, -30, 0, -30, 0.1);
     addObstacle(level1, assets.target0, 0, 0, -30);
+
+    new TWEEN.Tween(level1.obstacles.children[0].position)
+        .to({x: 10}, 5000)
+        .yoyo(true)
+        .repeat(Infinity)
+        .start();
+
+    {
+        const root = gameObjects.bow.children[0].children[0];
+        const top1 = root.children[0];
+        const top2 = top1.children[0];
+        const bottom1 = root.children[1];
+        const bottom2 = bottom1.children[0];
+        const bottomRope = bottom2.children[0];
+        const topRope = bottomRope.children[0];
+
+        const ropePosition = new THREE.Vector3();
+        const bowPosition = new THREE.Vector3();
+        const endPosition = new THREE.Vector3();
+
+        function updateRope() {
+            gameObjects.bow.updateMatrixWorld();
+            topRope.updateMatrixWorld();
+            bottomRope.updateMatrixWorld();
+
+            bowPosition.setFromMatrixPosition(gameObjects.bow.matrixWorld);
+            ropePosition.setFromMatrixPosition(bottomRope.matrixWorld);
+            endPosition.setFromMatrixPosition(topRope.matrixWorld);
+
+            const worldDirection = new THREE.Vector3();
+            gameObjects.bow.getWorldDirection(worldDirection);
+            const ray = new THREE.Ray(bowPosition, worldDirection);
+            const yOffset = ray.distanceToPoint(ropePosition);
+
+            const ropeLength = ropePosition.distanceTo(endPosition);
+            const absoluteAngle = Math.acos(clamp(yOffset / ropeLength, -1, 1));
+            const relativeAngle = absoluteAngle - (bottom1.rotation.z + bottom2.rotation.z);
+
+            bottomRope.rotation.z = relativeAngle;
+            topRope.rotation.z = -relativeAngle;
+
+            if(!gameObjects.arrow.inFlight)
+            {
+                topRope.updateMatrixWorld();
+                endPosition.setFromMatrixPosition(topRope.matrixWorld);
+                gameObjects.arrow.model.position.copy(endPosition);
+            }
+        }
+
+        // controls.addEventListener('change', updateRope);
+
+
+        new TWEEN.Tween(top1.rotation).to({z: Math.PI/12}, 3000)
+            .repeat(Infinity).yoyo(true).onUpdate(updateRope).start();
+
+        new TWEEN.Tween(top2.rotation).to({z: Math.PI/12}, 3000)
+            .repeat(Infinity).yoyo(true).onUpdate(updateRope).start();
+
+        new TWEEN.Tween(bottom1.rotation).to({z: -Math.PI/12}, 3000)
+            .repeat(Infinity).yoyo(true).onUpdate(updateRope).start();
+
+        new TWEEN.Tween(bottom2.rotation).to({z: -Math.PI/12}, 3000)
+            .repeat(Infinity).yoyo(true).onUpdate(updateRope).start();
+    }
 
     // level 2
     const level2 = new Level(2, assets.skybox_sky);
@@ -354,7 +421,7 @@ function init() {
 
             arrow.inFlight = true;
             arrow.collided = false;
-            previousCheckPosition.setFromMatrixPosition(arrow.model.matrixWorld);
+            previousCheckPosition.setFromMatrixPosition(arrow.model.children[0].children[0].matrixWorld);
 
             const tween = new TWEEN.Tween(arrow.model.position);
             tween.to({x: ray.origin.x, y: ray.origin.y, z: ray.origin.z}, 1000);
@@ -395,7 +462,7 @@ function init() {
 
         arrow.model.updateMatrixWorld();
         const arrowPos = new THREE.Vector3();
-        arrowPos.setFromMatrixPosition(arrow.model.matrixWorld);
+        arrowPos.setFromMatrixPosition(arrow.model.children[0].children[0].matrixWorld);
 
         const {forward, backward} = makeSegmentRays(previousCheckPosition, arrowPos);
 
@@ -420,7 +487,7 @@ function init() {
             }
         }
 
-        previousCheckPosition.setFromMatrixPosition(arrow.model.matrixWorld);
+        previousCheckPosition.setFromMatrixPosition(arrow.model.children[0].children[0].matrixWorld);
     }
 
     const overlay = new THREE.Scene();
