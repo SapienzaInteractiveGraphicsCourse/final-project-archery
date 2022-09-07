@@ -275,18 +275,48 @@ function init() {
         level.obstacles.add(obj);
     }
 
+
+    function animationX(l,n,val,time){
+        new TWEEN.Tween(l.obstacles.children[n].position)
+        .to({ x : val}, time).
+        yoyo(true).
+        repeat(Infinity).
+        start();
+
+    }
+    function animationY(l,n,val,time){
+        new TWEEN.Tween(l.obstacles.children[n].position)
+        .to({ y : val}, time).
+        yoyo(true).
+        repeat(Infinity).
+        start();
+
+    }
+
     // level 1
     const level1 = new Level(1, assets.skybox_forest);
-    addObstacle(level1, assets.target0, 0, 20, -30);
-    addObstacle(level1, assets.target1, 25, 0, -30, 0.3);
-    addObstacle(level1, assets.target2, -30, 0, -30, 0.1);
-    addObstacle(level1, assets.target0, 0, 0, -30);
+    addObstacle(level1, assets.target0, 0, 20, -20);
+    addObstacle(level1, assets.target1, 20, 0, -20, 0.3);
+    addObstacle(level1, assets.target2, -20, 0, -20, 0.1);
+    addObstacle(level1, assets.target0, 0, 0, -20);
+    addObstacle(level1, assets.target1, -20, 20, -20,0.3);
 
-    new TWEEN.Tween(level1.obstacles.children[0].position)
-        .to({x: 10}, 5000)
-        .yoyo(true)
-        .repeat(Infinity)
-        .start();
+
+
+    // new TWEEN.Tween(level1.obstacles.children[0].position).to({x: 10}, 3000).yoyo(true).repeat(Infinity).start();
+    // new TWEEN.Tween(level1.obstacles.children[1].position).to({x: 10}, 3000).yoyo(true).repeat(Infinity).start();
+    // new TWEEN.Tween(level1.obstacles.children[2].position).to({x: -10}, 3000).yoyo(true).repeat(Infinity).start();
+    // new TWEEN.Tween(level1.obstacles.children[3].position).to({y: 10}, 3000).yoyo(true).repeat(Infinity).start();
+    // new TWEEN.Tween(level1.obstacles.children[4].position).to({y: 0}, 3000).yoyo(true).repeat(Infinity).start();
+    animationX(level1,0,10,2000);
+    animationX(level1,1,10,2000);
+    animationX(level1,2,-10,2000);
+    animationY(level1,3,10,2000);
+    animationY(level1,4,0,2000);
+
+
+
+
 
     {
         const root = gameObjects.bow.children[0].children[0];
@@ -348,11 +378,32 @@ function init() {
 
     // level 2
     const level2 = new Level(2, assets.skybox_sky);
-    addObstacle(level2, assets.target0, 0, 20, -30);
-    addObstacle(level2, assets.target1, 25, 0, -30, 0.3);
-    addObstacle(level2, assets.target2, -30, 0, -30, 0.1);
-    addObstacle(level2, assets.target0, 0, 0, -30);
-    addObstacle(level2, assets.target4, -10, 10, -20, 4.95);
+    addObstacle(level2, assets.target0, 0, 20, -20);
+    addObstacle(level2, assets.target1, 20, 0, -20, 0.3);
+    addObstacle(level2, assets.target2, -20, 0, -20, 0.1);
+    addObstacle(level2, assets.target0, 0, 0, -20);
+    addObstacle(level2, assets.target1, -20, 20, -20,0.3);
+    addObstacle(level2, assets.target0, 17, 10, -20);
+    //addObstacle(level2, assets.target4, -10, 10, -20, 4.95);
+
+    //animation_2
+    // new TWEEN.Tween(level2.obstacles.children[0].position).to({x: 10}, 2000).yoyo(true).repeat(Infinity).start();
+    // new TWEEN.Tween(level2.obstacles.children[1].position).to({x: 10}, 2000).yoyo(true).repeat(Infinity).start();
+    // new TWEEN.Tween(level2.obstacles.children[2].position).to({x: -10}, 2000).yoyo(true).repeat(Infinity).start();
+    // new TWEEN.Tween(level2.obstacles.children[3].position).to({y: 10}, 2000).yoyo(true).repeat(Infinity).start();
+    // new TWEEN.Tween(level2.obstacles.children[4].position).to({y: 0}, 2000).yoyo(true).repeat(Infinity).start();
+    // new TWEEN.Tween(level2.obstacles.children[5].position).to({x: 0}, 2000).yoyo(true).repeat(Infinity).start();
+    
+    animationX(level2,0,10,1500);
+    animationX(level2,1,10,1500);
+    animationX(level2,2,-10,1500);
+    animationY(level2,3,10,1500);
+    animationY(level2,4,0,1500);
+    animationX(level2,5,2,1500);
+
+
+
+
 
     // level 3
     const level3 = new Level(3, assets.skybox_lava);
@@ -360,8 +411,22 @@ function init() {
     addObstacle(level3, assets.target1, 25, 0, -30, 0.3);
     addObstacle(level3, assets.target2, -30, 0, -30, 0.1);
     addObstacle(level3, assets.target0, 0, 0, -30);
-    addObstacle(level3, assets.target4, -10, 10, -20, 4.95);
+    //addObstacle(level3, assets.target4, -10, 10, -20, 4.95);
     addObstacle(level3, assets.target3, 10, 0, -20, 3.95);
+    addObstacle(level3, assets.target3, -10, 10, -20, 3.95);
+    //anim_3
+    animationX(level3,0,10,1000);
+    animationY(level3,1,15,1000);
+    animationX(level3,2,-15,1000);
+    animationY(level3,3,15,1000);
+    animationY(level3,4,-15,1000);
+    animationX(level3,5,-25,1000);
+
+
+
+
+
+
 
 
     let current_level = level1;

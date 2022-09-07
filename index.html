@@ -76,13 +76,13 @@
             }
             #info > div {
                 padding: 2em;
-                background-color: #eee;
+                background-color: rgba(238, 238, 238, 0.799);
             }
             #score {
                 position: absolute;
                 left: 0;
                 top: 0;
-                font-size: large;
+                font-size: xx-large;
                 color: rgba(255, 255, 255, 0.735);
                 pointer-events: none;
                 user-select: none;
@@ -93,14 +93,15 @@
                 padding: 1.1em;
                 background-image: linear-gradient(top right, #FFFFFF 0%, #AACFEF 100%);
                 font-weight: bold;
+                font-family: Iam-Hueca;
             }
             #scorenumber {
                 /* padding-top: 2px; */
                 font-size: xx-large;
             }
             .scoreimage {
-                width: 2em;
-                height: 2em;
+                width: 1.5em;
+                height: 1.5em;
             }
         </style>
     </head>
@@ -114,7 +115,13 @@
         </div>
         <div id="info", style="display: none;">
             <div>
-                <div>Click to play</div>
+                <div id="legend" style="font-weight: bold;font-family: Iam-Hueca; ">
+                    HOW TO PLAY:
+                    <li>Aim the targets</li>
+                    <li>Click to shoot the arrow.</li>
+                    <li>Score more than x and unlock a new level!</li>
+                    <li>Now click to play!</li>
+                </div>
             </div>
         </div>
         <div id="score", style="display: none;">
