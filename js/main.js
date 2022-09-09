@@ -91,8 +91,6 @@ const assets = {
     target1: {url: "/assets/targets/target.glb", loader: "gltf"},
     target2: {url: "/assets/targets/bullseye_target_custom_ue4_collison_included.glb", loader: "gltf"},
     target3: {url: "/assets/targets/poster_target.glb", loader: "gltf"},
-    target4: {url: "/assets/targets/scarecrow_target.glb", loader: "gltf"},
-    target5: {url: "/assets/targets/scarecrow_target2.glb", loader: "gltf"},
     skybox_forest: {
         url: [
             '/assets/skybox_images/forest-x.png',
@@ -377,7 +375,6 @@ function init() {
     addObstacle(level2, assets.target0, 0, 0, -20);
     addObstacle(level2, assets.target1, -20, 20, -20,0.3);
     addObstacle(level2, assets.target0, 17, 10, -20);
-    //addObstacle(level2, assets.target4, -10, 10, -20, 4.95);
 
     animationX(level2,0,10,1500);
     animationX(level2,1,10,1500);
@@ -396,7 +393,6 @@ function init() {
     addObstacle(level3, assets.target1, 25, 0, -30, 0.3);
     addObstacle(level3, assets.target2, -30, 0, -30, 0.1);
     addObstacle(level3, assets.target0, 0, 0, -30);
-    //addObstacle(level3, assets.target4, -10, 10, -20, 4.95);
     addObstacle(level3, assets.target3, 10, 0, -20, 3.95);
     addObstacle(level3, assets.target3, -10, 10, -20, 3.95);
     //anim_3
