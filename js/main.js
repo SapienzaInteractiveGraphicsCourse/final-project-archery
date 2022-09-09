@@ -265,11 +265,11 @@ function init() {
 
     // level 1
     const level1 = new Level(1, Assets.skybox_forest);
-    addObstacle(level1, Assets.target0, 0, 20, -20);
-    addObstacle(level1, Assets.target1, 20, 0, -20, 0.3);
-    addObstacle(level1, Assets.target2, -20, 0, -20, 0.1);
-    addObstacle(level1, Assets.target0, 0, 0, -20);
-    addObstacle(level1, Assets.target1, -20, 10, -20,0.3);
+    addObstacle(level1, Assets.target0, 0, 20, -30,1.5);
+    addObstacle(level1, Assets.target1, 20, 0, -30, 0.45);
+    addObstacle(level1, Assets.target2, -20, 0, -30, 0.15);
+    addObstacle(level1, Assets.target0, 0, 0, -30,1.5);
+    addObstacle(level1, Assets.target1, -20, 10, -30,0.45);
 
     animationX(level1,0,10,2000);
     animationX(level1,1,10,2000);
@@ -348,12 +348,12 @@ function init() {
 
     // level 2
     const level2 = new Level(2, Assets.skybox_sky);
-    addObstacle(level2, Assets.target0, 0, 20, -20);
-    addObstacle(level2, Assets.target1, 20, 0, -20, 0.3);
-    addObstacle(level2, Assets.target2, -20, 0, -20, 0.1);
-    addObstacle(level2, Assets.target0, 0, 0, -20);
-    addObstacle(level2, Assets.target1, -20, 20, -20,0.3);
-    addObstacle(level2, Assets.target0, 17, 10, -20);
+    addObstacle(level2, Assets.target0, 0, 20, -30,1.5);
+    addObstacle(level2, Assets.target1, 20, 0, -30, 0.45);
+    addObstacle(level2, Assets.target2, -20, 0, -30, 0.15);
+    addObstacle(level2, Assets.target0, 0, 0, -30,1.5);
+    addObstacle(level2, Assets.target1, -20, 20, -30,0.45);
+    addObstacle(level2, Assets.target0, 17, 10, -30,1.5);
 
     animationX(level2,0,10,1500);
     animationX(level2,1,10,1500);
@@ -364,12 +364,12 @@ function init() {
 
     // level 3
     const level3 = new Level(3, Assets.skybox_lava);
-    addObstacle(level3, Assets.target0, 0, 20, -30);
-    addObstacle(level3, Assets.target1, 25, 0, -30, 0.3);
-    addObstacle(level3, Assets.target2, -30, 0, -30, 0.1);
-    addObstacle(level3, Assets.target0, 0, 0, -30);
-    addObstacle(level3, Assets.target3, 10, 0, -20, 3.95);
-    addObstacle(level3, Assets.target3, -10, 10, -20, 3.95);
+    addObstacle(level3, Assets.target0, 0, 20, -30,1.5);
+    addObstacle(level3, Assets.target1, 25, 0, -30, 0.45);
+    addObstacle(level3, Assets.target2, -30, 0, -30, 0.15);
+    addObstacle(level3, Assets.target0, 0, 0, -30,1.5);
+    addObstacle(level3, Assets.target3, 10, 0, -30, 6);
+    addObstacle(level3, Assets.target3, -10, 10, -30, 6);
     //anim_3
     animationX(level3,0,10,1000);
     animationY(level3,1,15,1000);
