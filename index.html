@@ -4,7 +4,7 @@
         <style>
             @font-face {
                 font-family: 'Iam-Hueca';
-                src: local('Iam-Hueca'), url('font.ttf') format('truetype');
+                src: local('Iam-Hueca'), url('/assets/font.ttf') format('truetype');
             }
             html, body {
                 margin: 0;
@@ -129,9 +129,9 @@
                 <p>YOUR SCORE IS</p>
             </div>
             <div>
-                <img class="scoreimage" src="target.png">
+                <img class="scoreimage" src="/assets/target.png">
                 <span id="scorenumber">0</span>
-                <img class="scoreimage" src="target.png">
+                <img class="scoreimage" src="/assets/target.png">
             </div>
         </div>
 
@@ -139,11 +139,11 @@
         {
             "imports": {
                 "three": "./js/build/three.module.js",
-                "tween": "./js/tween.esm.js"
+                "tween": "./js/libs/tween.esm.js"
             }
         }
         </script>
-        <script async src="./js/es-module-shims.js"></script>
+        <script async src="./js/libs/es-module-shims.js"></script>
         <script type="module" src="./js/main.js"></script>
     </body>
 </html>
