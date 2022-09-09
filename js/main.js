@@ -462,9 +462,9 @@ function init() {
     }
 
     const menu_cubes = [
-        makeMenuCube(cubeGeometry, 15, 1.5, -10, assets.menu1),
-        makeMenuCube(cubeGeometry, 15, 0, -10, assets.menu2),
-        makeMenuCube(cubeGeometry, 15, -1.5, -10, assets.menu3),
+        makeMenuCube(cubeGeometry, 15, 1.5, -8, assets.menu1),
+        makeMenuCube(cubeGeometry, 15, 0, -8, assets.menu2),
+        makeMenuCube(cubeGeometry, 15, -1.5, -8, assets.menu3),
     ];
     menu_cubes[0].userData.level = level1;
     menu_cubes[1].userData.level = level2;
