@@ -100,6 +100,32 @@ class Arrow extends GameObject {
     }
 }
 
+class GameState {
+    static Paused = new GameState("Paused");
+    static Running = new GameState("Running");
+
+    constructor(name) {
+        this.name = name;
+    }
+    toString() {
+        return `GameState.${this.name}`;
+    }
+
+    static _current = GameState.Paused;
+    static get current() {
+        return GameState._current;
+    }
+    static set current(value) {
+        if(value instanceof GameState) {
+            GameState._current = value;
+            console.log(`Game state changed to ${value}`);
+        }
+        else {
+            console.error(`Trying to set gamestate to invalid value ${value}`);
+        }
+    }
+}
+
 const assets = {
     menu1: {url: "/assets/menu/1.jpeg", loader: "texture"},
     menu2: {url: "/assets/menu/2.jpeg", loader: "texture"},
@@ -224,8 +250,14 @@ function init() {
     const infoOverlay = document.querySelector("#info");
     infoOverlay.addEventListener('click', () => controls.lock());
     infoOverlay.addEventListener('mouseup', event => event.stopPropagation());
-    controls.addEventListener('lock', () => infoOverlay.style.display = 'none');
-    controls.addEventListener('unlock', () => infoOverlay.style.display = '');
+    controls.addEventListener('lock', () => {
+        infoOverlay.style.display = 'none';
+        GameState.current = GameState.Running;
+    });
+    controls.addEventListener('unlock', () => {
+        infoOverlay.style.display = '';
+        GameState.current = GameState.Paused;
+    });
 
     const gameObjects = {};
     {
@@ -601,22 +633,24 @@ function init() {
 
         cameraManager.resizeToDisplaySize(renderer, canvas);
 
-        TWEEN.update();
-        current_level.animationGroup.update();
+        if(GameState.current == GameState.Running) {
+            TWEEN.update();
+            current_level.animationGroup.update();
 
-        checkArrowCollision(current_level.obstacles.children, menu_cubes);
+            checkArrowCollision(current_level.obstacles.children, menu_cubes);
 
-        raycaster.setFromCamera({x: 0, y: 0}, camera);
-        const intersects = raycaster.intersectObjects(menu_cubes);
+            raycaster.setFromCamera({x: 0, y: 0}, camera);
+            const intersects = raycaster.intersectObjects(menu_cubes);
 
-        if(intersects.length > 0) {
-            const new_cube = intersects[0].object;
-            selected_menu = new_cube;
-            outlinePass.selectedObjects = [selected_menu];
-        }
-        else {
-            selected_menu = undefined;
-            outlinePass.selectedObjects = [];
+            if(intersects.length > 0) {
+                const new_cube = intersects[0].object;
+                selected_menu = new_cube;
+                outlinePass.selectedObjects = [selected_menu];
+            }
+            else {
+                selected_menu = undefined;
+                outlinePass.selectedObjects = [];
+            }
         }
 
         renderer.clear();
