@@ -109,7 +109,7 @@ const assets = {
     crosshair: {url: "/assets/crosshair.glb", loader: "gltf"},
     target0: {url: "/assets/targets/archery_target.glb", loader: "gltf"},
     target1: {url: "/assets/targets/target.glb", loader: "gltf"},
-    target2: {url: "/assets/targets/bullseye_target_custom_ue4_collison_included.glb", loader: "gltf"},
+    target2: {url: "/assets/targets/bullseye_target_winged.glb", loader: "gltf"},
     target3: {url: "/assets/targets/poster_target.glb", loader: "gltf"},
     skybox_forest: {
         url: [
@@ -326,8 +326,15 @@ function init() {
     animationY(level1,3,10,2000);
     animationY(level1,4,0,2000);
 
+    new TWEEN.Tween(level1.obstacles.children[2].parts["left_wing"].rotation)
+        .to({y: Math.PI / 6}, 1000)
+        .yoyo(true).repeat(Infinity)
+        .start();
 
-
+    new TWEEN.Tween(level1.obstacles.children[2].parts["right_wing"].rotation)
+        .to({y: Math.PI / 6}, 1000)
+        .yoyo(true).repeat(Infinity)
+        .start();
 
 
     {
