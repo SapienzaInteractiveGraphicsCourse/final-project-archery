@@ -51,15 +51,6 @@ class Level {
     }
 }
 
-class Arrow {
-    constructor(model) {
-        this.model = model;
-        this.inFlight = false;
-        this.collided = false;
-        this.tween = null;
-    }
-}
-
 class GameObject extends THREE.Object3D {
     constructor() {
         super()
@@ -97,6 +88,15 @@ class CollidableObject extends GameObject {
     onCollision(handler) {
         this.onCollisionHandler = handler;
         return this;
+    }
+}
+
+class Arrow extends GameObject {
+    constructor() {
+        super();
+        this.inFlight = false;
+        this.collided = false;
+        this.tween = null;
     }
 }
 
@@ -238,17 +238,20 @@ function init() {
         const obj = new GameObject();
         obj.add(gltf.scene);
         scene.add(obj);
-        obj.prepare();
-        console.log(obj);
 
+        obj.prepare();
         gameObjects.bow = obj;
     }
     {
         const gltf = assets.arrow;
         gltf.scene.children[0].scale.multiplyScalar(0.03);
-        scene.add(gltf.scene);
 
-        gameObjects.arrow = new Arrow(gltf.scene);
+        const arrow = new Arrow();
+        arrow.add(gltf.scene);
+        scene.add(arrow);
+
+        arrow.prepare();
+        gameObjects.arrow = arrow;
     }
 
     function updateFirstPersonObjects() {
@@ -269,8 +272,8 @@ function init() {
         bow.position.copy(ray.origin);
 
         if(!arrow.inFlight) {
-            arrow.model.rotation.setFromQuaternion(camera.quaternion);
-            arrow.model.position.copy(bow.position);
+            arrow.rotation.setFromQuaternion(camera.quaternion);
+            arrow.position.copy(bow.position);
         }
     }
     controls.addEventListener('change', updateFirstPersonObjects);
@@ -339,7 +342,6 @@ function init() {
 
     {
         const bow = gameObjects.bow;
-        const root = bow.parts["center"];
         const top1 = bow.parts["top1"];
         const top2 = bow.parts["top2"];
         const bottom1 = bow.parts["bottom1"];
@@ -376,7 +378,7 @@ function init() {
             {
                 topRope.updateMatrixWorld();
                 endPosition.setFromMatrixPosition(topRope.matrixWorld);
-                gameObjects.arrow.model.position.copy(endPosition);
+                gameObjects.arrow.position.copy(endPosition);
             }
         }
 
@@ -496,17 +498,17 @@ function init() {
 
             arrow.inFlight = true;
             arrow.collided = false;
-            previousCheckPosition.setFromMatrixPosition(arrow.model.children[0].children[0].matrixWorld);
+            previousCheckPosition.setFromMatrixPosition(arrow.parts["arrow_tip"].matrixWorld);
 
-            const tween = new TWEEN.Tween(arrow.model.position);
+            const tween = new TWEEN.Tween(arrow.position);
             tween.to({x: ray.origin.x, y: ray.origin.y, z: ray.origin.z}, 1000);
             tween.chain(
-                new TWEEN.Tween(arrow.model.position)
+                new TWEEN.Tween(arrow.position)
                     .to({x: 0, y: 0, z: 2.2}, 1)
                     .onComplete(() => {
                         arrow.inFlight = false;
-                        arrow.model.rotation.copy(gameObjects.bow.rotation);
-                        arrow.model.position.copy(gameObjects.bow.position);
+                        arrow.rotation.copy(gameObjects.bow.rotation);
+                        arrow.position.copy(gameObjects.bow.position);
                     })
             );
             tween.start();
@@ -535,9 +537,9 @@ function init() {
             return;
         }
 
-        arrow.model.updateMatrixWorld();
+        arrow.updateMatrixWorld();
         const arrowPos = new THREE.Vector3();
-        arrowPos.setFromMatrixPosition(arrow.model.children[0].children[0].matrixWorld);
+        arrowPos.setFromMatrixPosition(arrow.parts["arrow_tip"].matrixWorld);
 
         const {forward, backward} = makeSegmentRays(previousCheckPosition, arrowPos);
 
@@ -562,7 +564,7 @@ function init() {
             }
         }
 
-        previousCheckPosition.setFromMatrixPosition(arrow.model.children[0].children[0].matrixWorld);
+        previousCheckPosition.copy(arrowPos);
     }
 
     const overlay = new THREE.Scene();
