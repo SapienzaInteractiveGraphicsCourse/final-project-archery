@@ -60,12 +60,32 @@ class Arrow {
     }
 }
 
-class CollidableObject extends THREE.Object3D {
+class GameObject extends THREE.Object3D {
+    constructor() {
+        super()
+        this.parts = {}
+    }
+    prepare() {
+        this._visit(this);
+    }
+    _visit(obj) {
+        if(obj.name != "") {
+            this.parts[obj.name] = obj;
+        }
+        for(const child of obj.children) {
+            this._visit(child);
+        }
+    }
+}
+
+class CollidableObject extends GameObject {
     constructor() {
         super();
         this.onCollisionHandler = () => {};
     }
     prepare() {
+        super.prepare();
+
         const convexHull = new ConvexHull();
         convexHull.setFromObject(this);
         this.userData.convexHull = convexHull;
@@ -210,15 +230,16 @@ function init() {
     const gameObjects = {};
     {
         const gltf = assets.bow;
-        console.log(gltf);
         gltf.scene.scale.multiplyScalar(0.1 * 0.1);
         gltf.scene.position.z = 2.6;
         gltf.scene.rotation.z = -Math.PI / 2;
         gltf.scene.rotation.y = Math.PI / 2;
 
-        const obj = new THREE.Object3D();
+        const obj = new GameObject();
         obj.add(gltf.scene);
         scene.add(obj);
+        obj.prepare();
+        console.log(obj);
 
         gameObjects.bow = obj;
     }
@@ -310,13 +331,14 @@ function init() {
 
 
     {
-        const root = gameObjects.bow.children[0].children[0];
-        const top1 = root.children[0];
-        const top2 = top1.children[0];
-        const bottom1 = root.children[1];
-        const bottom2 = bottom1.children[0];
-        const bottomRope = bottom2.children[0];
-        const topRope = bottomRope.children[0];
+        const bow = gameObjects.bow;
+        const root = bow.parts["center"];
+        const top1 = bow.parts["top1"];
+        const top2 = bow.parts["top2"];
+        const bottom1 = bow.parts["bottom1"];
+        const bottom2 = bow.parts["bottom2"];
+        const bottomRope = bow.parts["rope_bottom"];
+        const topRope = bow.parts["rope_top"];
 
         const ropePosition = new THREE.Vector3();
         const bowPosition = new THREE.Vector3();
