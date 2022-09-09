@@ -299,15 +299,8 @@ function init() {
     addObstacle(level1, assets.target1, 20, 0, -20, 0.3);
     addObstacle(level1, assets.target2, -20, 0, -20, 0.1);
     addObstacle(level1, assets.target0, 0, 0, -20);
-    addObstacle(level1, assets.target1, -20, 20, -20,0.3);
+    addObstacle(level1, assets.target1, -20, 10, -20,0.3);
 
-
-
-    // new TWEEN.Tween(level1.obstacles.children[0].position).to({x: 10}, 3000).yoyo(true).repeat(Infinity).start();
-    // new TWEEN.Tween(level1.obstacles.children[1].position).to({x: 10}, 3000).yoyo(true).repeat(Infinity).start();
-    // new TWEEN.Tween(level1.obstacles.children[2].position).to({x: -10}, 3000).yoyo(true).repeat(Infinity).start();
-    // new TWEEN.Tween(level1.obstacles.children[3].position).to({y: 10}, 3000).yoyo(true).repeat(Infinity).start();
-    // new TWEEN.Tween(level1.obstacles.children[4].position).to({y: 0}, 3000).yoyo(true).repeat(Infinity).start();
     animationX(level1,0,10,2000);
     animationX(level1,1,10,2000);
     animationX(level1,2,-10,2000);
@@ -386,19 +379,11 @@ function init() {
     addObstacle(level2, assets.target0, 17, 10, -20);
     //addObstacle(level2, assets.target4, -10, 10, -20, 4.95);
 
-    //animation_2
-    // new TWEEN.Tween(level2.obstacles.children[0].position).to({x: 10}, 2000).yoyo(true).repeat(Infinity).start();
-    // new TWEEN.Tween(level2.obstacles.children[1].position).to({x: 10}, 2000).yoyo(true).repeat(Infinity).start();
-    // new TWEEN.Tween(level2.obstacles.children[2].position).to({x: -10}, 2000).yoyo(true).repeat(Infinity).start();
-    // new TWEEN.Tween(level2.obstacles.children[3].position).to({y: 10}, 2000).yoyo(true).repeat(Infinity).start();
-    // new TWEEN.Tween(level2.obstacles.children[4].position).to({y: 0}, 2000).yoyo(true).repeat(Infinity).start();
-    // new TWEEN.Tween(level2.obstacles.children[5].position).to({x: 0}, 2000).yoyo(true).repeat(Infinity).start();
-    
     animationX(level2,0,10,1500);
     animationX(level2,1,10,1500);
     animationX(level2,2,-10,1500);
     animationY(level2,3,10,1500);
-    animationY(level2,4,0,1500);
+    animationY(level2,4,10,1500);
     animationX(level2,5,2,1500);
 
 
