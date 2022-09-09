@@ -7,11 +7,12 @@ import {PointerLockControls} from './examples/jsm/controls/PointerLockControls.j
 
 import {GLTFLoader} from './examples/jsm/loaders/GLTFLoader.js';
 import * as SkeletonUtils from './examples/jsm/utils/SkeletonUtils.js';
-import {ConvexHull} from './examples/jsm/math/ConvexHull.js';
 
 import {EffectComposer} from './examples/jsm/postprocessing/EffectComposer.js';
 import {RenderPass} from './examples/jsm/postprocessing/RenderPass.js';
 import {OutlinePass} from './examples/jsm/postprocessing/OutlinePass.js';
+
+import { GameObject, CollidableObject } from './GameObject.js';
 
 const clamp = (x, a, b) => Math.min(Math.max(x, a), b);
 
@@ -48,46 +49,6 @@ class Level {
         this.animationGroup = new TWEEN.Group();
         this.obstacles = new THREE.Object3D();
         this.skybox = skybox;
-    }
-}
-
-class GameObject extends THREE.Object3D {
-    constructor() {
-        super()
-        this.parts = {}
-    }
-    prepare() {
-        this._visit(this);
-    }
-    _visit(obj) {
-        if(obj.name != "") {
-            this.parts[obj.name] = obj;
-        }
-        for(const child of obj.children) {
-            this._visit(child);
-        }
-    }
-}
-
-class CollidableObject extends GameObject {
-    constructor() {
-        super();
-        this.onCollisionHandler = () => {};
-    }
-    prepare() {
-        super.prepare();
-
-        const convexHull = new ConvexHull();
-        convexHull.setFromObject(this);
-        this.userData.convexHull = convexHull;
-
-        this.updateMatrixWorld();
-        this.userData.originalPosition = new THREE.Vector3();
-        this.userData.originalPosition.setFromMatrixPosition(this.matrixWorld);
-    }
-    onCollision(handler) {
-        this.onCollisionHandler = handler;
-        return this;
     }
 }
 
