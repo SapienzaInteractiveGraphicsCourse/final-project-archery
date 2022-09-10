@@ -8,7 +8,7 @@ export const Assets = {
     target0: {url: "/assets/targets/archery_target.glb", loader: "gltf"},
     target1: {url: "/assets/targets/target.glb", loader: "gltf"},
     target2: {url: "/assets/targets/bullseye_target_winged.glb", loader: "gltf"},
-    target3: {url: "/assets/targets/poster_target.glb", loader: "gltf"},
+    target3: {url: "/assets/targets/poster_in_4.glb", loader: "gltf"},
     skybox_forest: {
         url: [
             '/assets/skybox_images/forest-x.png',

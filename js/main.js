@@ -6,7 +6,6 @@ import { OrbitControls } from './examples/jsm/controls/OrbitControls.js';
 import { PointerLockControls } from './examples/jsm/controls/PointerLockControls.js';
 
 import { GLTFLoader } from './examples/jsm/loaders/GLTFLoader.js';
-import * as SkeletonUtils from './examples/jsm/utils/SkeletonUtils.js';
 
 import { EffectComposer } from './examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from './examples/jsm/postprocessing/RenderPass.js';
@@ -14,6 +13,7 @@ import { OutlinePass } from './examples/jsm/postprocessing/OutlinePass.js';
 
 import { GameObject, CollidableObject } from './GameObject.js';
 import { Assets } from './Assets.js';
+import { LinearTarget0, LinearTarget1, WingedTarget, PosterTarget } from './Targets.js';
 
 const clamp = (x, a, b) => Math.min(Math.max(x, a), b);
 
@@ -226,68 +226,6 @@ function init() {
     }
     controls.addEventListener('change', updateFirstPersonObjects);
 
-    let score = 0;
-    const scoreText = document.querySelector("#scorenumber");
-
-    function addObstacle(level, gltf, x, y, z, scale = 1) {
-        const obj = new CollidableObject().onCollision(obj => {
-            console.log(`Hit obstacle worth ${obj.userData.pointValue} points`);
-            score += obj.userData.pointValue;
-            scoreText.innerHTML = score;
-        });
-        obj.position.set(x, y, z);
-        obj.scale.multiplyScalar(scale);
-        obj.add(SkeletonUtils.clone(gltf.scene));
-
-        obj.userData.pointValue = (Math.random() * 19 + 1) | 0;
-
-        obj.prepare();
-        level.obstacles.add(obj);
-    }
-
-
-    function animationX(l,n,val,time){
-        new TWEEN.Tween(l.obstacles.children[n].position)
-        .to({ x : val}, time).
-        yoyo(true).
-        repeat(Infinity).
-        start();
-
-    }
-    function animationY(l,n,val,time){
-        new TWEEN.Tween(l.obstacles.children[n].position)
-        .to({ y : val}, time).
-        yoyo(true).
-        repeat(Infinity).
-        start();
-
-    }
-
-    // level 1
-    const level1 = new Level(1, Assets.skybox_forest);
-    addObstacle(level1, Assets.target0, 0, 20, -30,1.5);
-    addObstacle(level1, Assets.target1, 20, 0, -30, 0.45);
-    addObstacle(level1, Assets.target2, -20, 0, -30, 0.15);
-    addObstacle(level1, Assets.target0, 0, 0, -30,1.5);
-    addObstacle(level1, Assets.target1, -20, 10, -30,0.45);
-
-    animationX(level1,0,10,2000);
-    animationX(level1,1,10,2000);
-    animationX(level1,2,-10,2000);
-    animationY(level1,3,10,2000);
-    animationY(level1,4,0,2000);
-
-    new TWEEN.Tween(level1.obstacles.children[2].parts["left_wing"].rotation)
-        .to({y: Math.PI / 6}, 1000)
-        .yoyo(true).repeat(Infinity)
-        .start();
-
-    new TWEEN.Tween(level1.obstacles.children[2].parts["right_wing"].rotation)
-        .to({y: Math.PI / 6}, 1000)
-        .yoyo(true).repeat(Infinity)
-        .start();
-
-
     {
         const bow = gameObjects.bow;
         const top1 = bow.parts["top1"];
@@ -346,37 +284,30 @@ function init() {
             .repeat(Infinity).yoyo(true).onUpdate(updateRope).start();
     }
 
+    // level 1
+    const level1 = new Level(1, Assets.skybox_forest);
+    level1.obstacles.add(new LinearTarget0(0, 20, -30, "x", "-10", 2000));
+    level1.obstacles.add(new LinearTarget1(20, 0, -30, "x", "-10", 2000));
+    level1.obstacles.add(new LinearTarget0(0, 0, -30, "y", "+10", 2000));
+    level1.obstacles.add(new LinearTarget1(-20, 10, -30, "y", "-10", 2000));
+
     // level 2
     const level2 = new Level(2, Assets.skybox_sky);
-    addObstacle(level2, Assets.target0, 0, 20, -30,1.5);
-    addObstacle(level2, Assets.target1, 20, 0, -30, 0.45);
-    addObstacle(level2, Assets.target2, -20, 0, -30, 0.15);
-    addObstacle(level2, Assets.target0, 0, 0, -30,1.5);
-    addObstacle(level2, Assets.target1, -20, 20, -30,0.45);
-    addObstacle(level2, Assets.target0, 17, 10, -30,1.5);
-
-    animationX(level2,0,10,1500);
-    animationX(level2,1,10,1500);
-    animationX(level2,2,-10,1500);
-    animationY(level2,3,10,1500);
-    animationY(level2,4,10,1500);
-    animationX(level2,5,2,1500);
+    level2.obstacles.add(new LinearTarget0(0, 20, -30, "x", "-10", 1500));
+    level2.obstacles.add(new LinearTarget1(20, 0, -30, "x", "-10", 1500));
+    level2.obstacles.add(new LinearTarget0(0, 0, -30, "y", "+10", 1500));
+    level2.obstacles.add(new LinearTarget1(-20, 10, -30, "y", "-10", 1500));
+    level2.obstacles.add(new LinearTarget0(17, 10, -30, "x", "-15", 1500));
+    level2.obstacles.add(new WingedTarget(-20, 0, -30));
 
     // level 3
     const level3 = new Level(3, Assets.skybox_lava);
-    addObstacle(level3, Assets.target0, 0, 20, -30,1.5);
-    addObstacle(level3, Assets.target1, 25, 0, -30, 0.45);
-    addObstacle(level3, Assets.target2, -30, 0, -30, 0.15);
-    addObstacle(level3, Assets.target0, 0, 0, -30,1.5);
-    addObstacle(level3, Assets.target3, 10, 0, -30, 6);
-    addObstacle(level3, Assets.target3, -10, 10, -30, 6);
-    //anim_3
-    animationX(level3,0,10,1000);
-    animationY(level3,1,15,1000);
-    animationX(level3,2,-15,1000);
-    animationY(level3,3,15,1000);
-    animationY(level3,4,-15,1000);
-    animationX(level3,5,-25,1000);
+    level3.obstacles.add(new LinearTarget0(0, 20, -30, "x", "+10", 1000));
+    level3.obstacles.add(new LinearTarget1(25, 0, -30, "y", "+15", 1000));
+    level3.obstacles.add(new WingedTarget(-30, 0, -30));
+    level3.obstacles.add(new LinearTarget0(0, 0, -30, "y", "+15", 1000));
+    level3.obstacles.add(new PosterTarget(10, 0, -30));
+    level3.obstacles.add(new PosterTarget(-10, 10, -30));
 
     let current_level = level1;
     scene.add(level1.obstacles);
