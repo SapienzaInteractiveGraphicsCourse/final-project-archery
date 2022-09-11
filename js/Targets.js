@@ -120,12 +120,51 @@ export class WingedTarget extends Target {
     }
 }
 
+class PosterState {
+    static Waiting = new PosterState("Waiting");
+    static Active = new PosterState("Active");
+    static Hit = new PosterState("Hit");
+
+    constructor(name) {
+        this.name = name;
+    }
+    toString() {
+        return `PosterState.${this.name}`;
+    }
+
+    static current = PosterState.Waiting;
+}
+
 export class PosterTarget extends Target {
     constructor(x, y, z) {
         super();
 
+        this.state = PosterState.Waiting;
+
         this.onCollision(obj => {
-            ScoreManager.add(obj.userData.pointValue);
+            if(this.state == PosterState.Active) {
+                ScoreManager.add(obj.userData.pointValue);
+
+                this.state = PosterState.Hit;
+
+                // boom
+                new TWEEN.Tween(this.parts["upper_left"].position)
+                    .to({x: "-100", z: "+100"}, 2000)
+                    .easing(TWEEN.Easing.Quadratic.In)
+                    .start();
+                new TWEEN.Tween(this.parts["upper_right"].position)
+                    .to({x: "+100", z: "+100"}, 2000)
+                    .easing(TWEEN.Easing.Quadratic.In)
+                    .start();
+                new TWEEN.Tween(this.parts["lower_left"].position)
+                    .to({x: "-100", z: "-100"}, 2000)
+                    .easing(TWEEN.Easing.Quadratic.In)
+                    .start();
+                new TWEEN.Tween(this.parts["lower_right"].position)
+                    .to({x: "+100", z: "-100"}, 2000)
+                    .easing(TWEEN.Easing.Quadratic.In)
+                    .start();
+            }
         });
 
         this.position.set(x, y, z);
@@ -135,5 +174,25 @@ export class PosterTarget extends Target {
         this.userData.pointValue = 100;
 
         this.prepare();
+
+        // Hide the obstacle, show it after 5s
+        this.position.x -= 100;
+        this.addTween(
+            new TWEEN.Tween(this.position)
+                .to({x: "+100"}, 5000)
+                .easing(amount => (amount > 0.99) ? 1 : 0)
+                .onComplete(() => this.state = PosterState.Active)
+        );
+    }
+    // When we rset the animation, also reset this target's state
+    startTweens() {
+        super.startTweens();
+        this.state = PosterState.Waiting;
+
+        // Reset the position of the parts after an explosion
+        this.parts["upper_left"].position.set(0, 0, 0);
+        this.parts["upper_right"].position.set(0, 0, 0);
+        this.parts["lower_left"].position.set(0, 0, 0);
+        this.parts["lower_right"].position.set(0, 0, 0);
     }
 }
