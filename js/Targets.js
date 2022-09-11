@@ -63,6 +63,33 @@ export class WingedTarget extends CollidableObject {
             .to({y: Math.PI / 6}, 1000)
             .yoyo(true).repeat(Infinity)
             .start();
+
+        // Move in a circle
+        const radius = 5;
+        const duration = 3000;
+
+        // x axis
+        new TWEEN.Tween(this.position)
+            .to({x: `+${2*radius}`}, duration)
+            .yoyo(true).repeat(Infinity)
+            .easing(TWEEN.Easing.Sinusoidal.InOut)
+            .start();
+
+        // y axis
+        const a = new TWEEN.Tween(this.position)
+            .to({y: `+${radius}`}, duration / 2)
+            .easing(TWEEN.Easing.Sinusoidal.Out);
+        const b = new TWEEN.Tween(this.position)
+            .to({y: `-${2*radius}`}, duration)
+            .easing(TWEEN.Easing.Sinusoidal.InOut);
+        const c = new TWEEN.Tween(this.position)
+            .to({y: `+${radius}`}, duration / 2)
+            .easing(TWEEN.Easing.Sinusoidal.In);
+
+        a.chain(b);
+        b.chain(c);
+        c.chain(a);
+        a.start();
     }
 }
 

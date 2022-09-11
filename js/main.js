@@ -298,7 +298,7 @@ function init() {
     level2.obstacles.add(new LinearTarget0(0, 0, -30, "y", "+10", 1500));
     level2.obstacles.add(new LinearTarget1(-20, 10, -30, "y", "-10", 1500));
     level2.obstacles.add(new LinearTarget0(17, 10, -30, "x", "-15", 1500));
-    level2.obstacles.add(new WingedTarget(-20, 0, -30));
+    level2.obstacles.add(new WingedTarget(-20, 0, -27));
 
     // level 3
     const level3 = new Level(3, Assets.skybox_lava);
