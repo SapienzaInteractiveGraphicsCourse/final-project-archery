@@ -4,7 +4,27 @@ import { Assets } from './Assets.js';
 import { CollidableObject } from './GameObject.js';
 import { ScoreManager } from './ScoreManager.js';
 
-class LinearTarget extends CollidableObject {
+class Target extends CollidableObject {
+    constructor() {
+        super();
+        this._tweens = [];
+    }
+    addTween(t) {
+        this._tweens.push(t);
+    }
+    startTweens() {
+        for(const t of this._tweens) {
+            t.start();
+        }
+    }
+    stopTweens() {
+        for(const t of this._tweens) {
+            t.stop();
+        }
+    }
+}
+
+class LinearTarget extends Target {
     constructor(x, y, z, axis, offset, time, model, scale) {
         super();
 
@@ -21,8 +41,11 @@ class LinearTarget extends CollidableObject {
         this.prepare();
 
         const to = (axis == "x") ? {x: offset} : {y: offset};
-        new TWEEN.Tween(this.position).to(to, time)
-            .yoyo(true).repeat(Infinity).start();
+        this.addTween(
+            new TWEEN.Tween(this.position)
+            .to(to, time)
+            .yoyo(true).repeat(Infinity)
+        );
     }
 }
 
@@ -38,7 +61,7 @@ export class LinearTarget1 extends LinearTarget {
     }
 }
 
-export class WingedTarget extends CollidableObject {
+export class WingedTarget extends Target {
     constructor(x, y, z) {
         super();
 
@@ -55,25 +78,28 @@ export class WingedTarget extends CollidableObject {
         this.prepare();
 
         // Wings
-        new TWEEN.Tween(this.parts["left_wing"].rotation)
+        this.addTween(
+            new TWEEN.Tween(this.parts["left_wing"].rotation)
             .to({y: Math.PI / 6}, 1000)
             .yoyo(true).repeat(Infinity)
-            .start();
-        new TWEEN.Tween(this.parts["right_wing"].rotation)
+        );
+        this.addTween(
+            new TWEEN.Tween(this.parts["right_wing"].rotation)
             .to({y: Math.PI / 6}, 1000)
             .yoyo(true).repeat(Infinity)
-            .start();
+        );
 
         // Move in a circle
         const radius = 5;
         const duration = 3000;
 
         // x axis
-        new TWEEN.Tween(this.position)
+        this.addTween(
+            new TWEEN.Tween(this.position)
             .to({x: `+${2*radius}`}, duration)
             .yoyo(true).repeat(Infinity)
             .easing(TWEEN.Easing.Sinusoidal.InOut)
-            .start();
+        );
 
         // y axis
         const a = new TWEEN.Tween(this.position)
@@ -89,11 +115,12 @@ export class WingedTarget extends CollidableObject {
         a.chain(b);
         b.chain(c);
         c.chain(a);
-        a.start();
+
+        this.addTween(a);
     }
 }
 
-export class PosterTarget extends CollidableObject {
+export class PosterTarget extends Target {
     constructor(x, y, z) {
         super();
 

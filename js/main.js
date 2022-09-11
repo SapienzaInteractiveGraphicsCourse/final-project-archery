@@ -51,6 +51,16 @@ class Level {
         this.obstacles = new THREE.Object3D();
         this.skybox = skybox;
     }
+    startTweens() {
+        for(const target of this.obstacles.children){
+            target.startTweens();
+        }
+    }
+    stopTweens() {
+        for(const target of this.obstacles.children){
+            target.stopTweens();
+        }
+    }
 }
 
 class Arrow extends GameObject {
@@ -312,7 +322,7 @@ function init() {
     let current_level = level1;
     scene.add(level1.obstacles);
     scene.background = level1.skybox;
-
+    level1.startTweens();
 
     const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
 
@@ -320,6 +330,9 @@ function init() {
         const obj = new CollidableObject().onCollision(obj => {
             const {level} = obj.userData;
             console.log(`Level change to ${level.levelId}`);
+
+            current_level.stopTweens();
+            level.startTweens();
 
             scene.remove(current_level.obstacles);
             scene.add(level.obstacles);
