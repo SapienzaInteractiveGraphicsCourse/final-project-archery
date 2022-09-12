@@ -5,8 +5,24 @@ import { GameObject } from './GameObject.js';
 
 const clamp = (x, a, b) => Math.min(Math.max(x, a), b);
 
+class BowState {
+    static Waiting = new BowState("Waiting");
+    static Ready = new BowState("Ready");
+
+    constructor(name) {
+        this.name = name;
+    }
+    toString() {
+        return `BowState.${this.name}`;
+    }
+
+    static current = BowState.Waiting;
+}
+
 export class Bow extends GameObject {
     arrow = null;
+    state = BowState.Waiting;
+    onMouseUp = null;
 
     constructor() {
         super();
@@ -30,6 +46,11 @@ export class Bow extends GameObject {
         this.tweenMouseup = [];
 
         document.addEventListener('mousedown', () => {
+            if(this.arrow.inFlight) {
+                return;
+            }
+            this.state = BowState.Ready;
+
             for(const t of this.tweenMouseup) {
                 t.stop();
             }
@@ -45,6 +66,11 @@ export class Bow extends GameObject {
         });
 
         document.addEventListener('mouseup', () => {
+            if(this.state != BowState.Ready) {
+                return;
+            }
+            this.state = BowState.Waiting;
+
             for(const t of this.tweenMousedown) {
                 t.stop();
             }
@@ -56,6 +82,10 @@ export class Bow extends GameObject {
             ];
             for(const t of this.tweenMouseup) {
                 t.start();
+            }
+
+            if(this.onMouseUp != null) {
+                this.onMouseUp();
             }
         });
     }
@@ -89,15 +119,14 @@ export class Bow extends GameObject {
         bottomRope.rotation.z = relativeAngle;
         topRope.rotation.z = -relativeAngle;
 
-        if(this.arrow != null && !this.arrow.inFlight)
-        {
-            topRope.updateMatrixWorld();
-            endPosition.setFromMatrixPosition(topRope.matrixWorld);
-            this.arrow.position.copy(endPosition);
+        if(this.arrow != null && !this.arrow.inFlight) {
+            this.getArrowPosition(this.arrow.position);
         }
     }
 
-    setArrow(obj) {
-        this.arrow = obj;
+    getArrowPosition(target) {
+        const topRope = this.parts["rope_top"];
+        this.updateMatrixWorld();
+        target.setFromMatrixPosition(topRope.matrixWorld);
     }
 }

@@ -11,11 +11,11 @@ import { EffectComposer } from './examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from './examples/jsm/postprocessing/RenderPass.js';
 import { OutlinePass } from './examples/jsm/postprocessing/OutlinePass.js';
 
-import { GameObject } from './GameObject.js';
 import { Assets } from './Assets.js';
 import { Levels } from './Levels.js';
 import { LevelSelector } from './LevelSelector.js';
 import { Bow } from './Bow.js';
+import { Arrow } from './Arrow.js';
 
 class CameraManager {
     constructor() {
@@ -41,15 +41,6 @@ class CameraManager {
             return true;
         }
         return false;
-    }
-}
-
-class Arrow extends GameObject {
-    constructor() {
-        super();
-        this.inFlight = false;
-        this.collided = false;
-        this.tween = null;
     }
 }
 
@@ -168,23 +159,16 @@ function init() {
     });
 
     const gameObjects = {
-        bow: new Bow()
+        bow: new Bow(),
+        arrow: new Arrow()
     };
-    {
-        const gltf = Assets.arrow;
-        gltf.scene.children[0].scale.multiplyScalar(0.03);
 
-        const arrow = new Arrow();
-        arrow.add(gltf.scene);
-        scene.add(arrow);
-
-        arrow.prepare();
-        gameObjects.arrow = arrow;
-    }
-
-    gameObjects.bow.setArrow(gameObjects.arrow);
+    gameObjects.bow.arrow = gameObjects.arrow;
+    gameObjects.arrow.bow = gameObjects.bow;
 
     scene.add(gameObjects.bow);
+    scene.add(gameObjects.arrow);
+
 
     function updateFirstPersonObjects() {
         const worldPosition = new THREE.Vector3();
@@ -203,10 +187,12 @@ function init() {
         bow.rotation.setFromQuaternion(camera.quaternion);
         bow.position.copy(ray.origin);
 
-        if(!arrow.inFlight) {
-            arrow.rotation.setFromQuaternion(camera.quaternion);
-            arrow.position.copy(bow.position);
-        }
+        arrow.updatePositionDirection();
+
+        // if(!arrow.inFlight) {
+        //     arrow.rotation.setFromQuaternion(camera.quaternion);
+        //     arrow.position.copy(bow.parts["rope_top"].position);
+        // }
     }
     controls.addEventListener('change', updateFirstPersonObjects);
 
@@ -215,93 +201,16 @@ function init() {
 
     const raycaster = new THREE.Raycaster();
 
-    const previousCheckPosition = new THREE.Vector3();
-
-    document.addEventListener('mouseup', () => {
+    gameObjects.bow.onMouseUp = () => {
         const {arrow} = gameObjects;
-        if(!arrow.inFlight) {
-            const worldPosition = new THREE.Vector3();
-            const worldDirection = new THREE.Vector3();
-            camera.getWorldPosition(worldPosition);
-            camera.getWorldDirection(worldDirection);
+        const worldPosition = new THREE.Vector3();
+        const worldDirection = new THREE.Vector3();
+        camera.getWorldPosition(worldPosition);
+        camera.getWorldDirection(worldDirection);
 
-            const ray = new THREE.Ray(worldPosition, worldDirection);
-            ray.recast(50);
-
-            arrow.inFlight = true;
-            arrow.collided = false;
-            previousCheckPosition.setFromMatrixPosition(arrow.parts["arrow_tip"].matrixWorld);
-
-            const tween = new TWEEN.Tween(arrow.position);
-            tween.to({x: ray.origin.x, y: ray.origin.y, z: ray.origin.z}, 1000);
-            tween.chain(
-                new TWEEN.Tween(arrow.position)
-                    .to({x: 0, y: 0, z: 2.2}, 1)
-                    .onComplete(() => {
-                        arrow.inFlight = false;
-                        arrow.rotation.copy(gameObjects.bow.rotation);
-                        arrow.position.copy(gameObjects.bow.position);
-                    })
-            );
-            tween.start();
-        }
-    });
-
-    function makeSegmentRays(/**@type THREE.Vector3 */ a, /**@type THREE.Vector3 */ b) {
-        return {
-            forward: new THREE.Ray(a, b.clone().sub(a).normalize()),
-            backward: new THREE.Ray(b, a.clone().sub(b).normalize())
-        };
-    }
-
-    // Since the targets are thin, simply checking that the arrow intersects
-    // their convex hull isn't sufficient: the arrow could go from one side
-    // of the target to the other in a single frame.
-    // Instead, check for intersection between the convex hull and the segment
-    // connecting the arrow's position in the previous frame and the current
-    // position.
-    // ConvexHull only supports ray intersection, so to check for segment
-    // intersection verify that both the A->B and B->A rays intersect with the
-    // hull.
-    function checkArrowCollision(...targets) {
-        const {arrow} = gameObjects;
-        if(!arrow.inFlight || arrow.collided) {
-            return;
-        }
-
-        arrow.updateMatrixWorld();
-        const arrowPos = new THREE.Vector3();
-        arrowPos.setFromMatrixPosition(arrow.parts["arrow_tip"].matrixWorld);
-
-        const {forward, backward} = makeSegmentRays(previousCheckPosition, arrowPos);
-
-        for(const targetGroup of targets) {
-            for(const obstacle of targetGroup) {
-
-                if(!obstacle.collidable) {
-                    continue;
-                }
-
-                // The convex hulls are computed at obstacle creation, and are not transformed
-                // when animating. To compensate for this, translate the segment in the
-                // opposite direction of the current translation of this obstacle
-                const offset = new THREE.Vector3();
-                offset.setFromMatrixPosition(obstacle.matrixWorld);
-                offset.sub(obstacle.userData.originalPosition);
-
-                const translatedForward = new THREE.Ray(forward.origin.clone().sub(offset), forward.direction);
-                const translatedBackward = new THREE.Ray(backward.origin.clone().sub(offset), backward.direction);
-
-                const convexHull = obstacle.userData.convexHull;
-                if(convexHull.intersectsRay(translatedForward) && convexHull.intersectsRay(translatedBackward)) {
-                    obstacle.onCollisionHandler(obstacle);
-                    arrow.collided = true;
-                }
-            }
-        }
-
-        previousCheckPosition.copy(arrowPos);
-    }
+        const ray = new THREE.Ray(worldPosition, worldDirection);
+        arrow.shoot(ray);
+    };
 
     const overlay = new THREE.Scene();
     {
@@ -341,7 +250,7 @@ function init() {
             TWEEN.update();
             levelSelector.current.animationGroup.update();
 
-            checkArrowCollision(
+            gameObjects.arrow.checkCollision(
                 levelSelector.current.obstacles.children,
                 levelSelector.menu_cubes
             );
