@@ -22,6 +22,7 @@ export class GameObject extends THREE.Object3D {
 export class CollidableObject extends GameObject {
     constructor() {
         super();
+        this.collidable = true;
         this.onCollisionHandler = () => {};
     }
     prepare() {

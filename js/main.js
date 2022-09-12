@@ -11,9 +11,10 @@ import { EffectComposer } from './examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from './examples/jsm/postprocessing/RenderPass.js';
 import { OutlinePass } from './examples/jsm/postprocessing/OutlinePass.js';
 
-import { GameObject, CollidableObject } from './GameObject.js';
+import { GameObject } from './GameObject.js';
 import { Assets } from './Assets.js';
-import { LinearTarget0, LinearTarget1, WingedTarget, PosterTarget } from './Targets.js';
+import { Levels } from './Levels.js';
+import { LevelSelector } from './LevelSelector.js';
 
 const clamp = (x, a, b) => Math.min(Math.max(x, a), b);
 
@@ -41,25 +42,6 @@ class CameraManager {
             return true;
         }
         return false;
-    }
-}
-
-class Level {
-    constructor(levelId, skybox) {
-        this.levelId = levelId;
-        this.animationGroup = new TWEEN.Group();
-        this.obstacles = new THREE.Object3D();
-        this.skybox = skybox;
-    }
-    startTweens() {
-        for(const target of this.obstacles.children){
-            target.startTweens();
-        }
-    }
-    stopTweens() {
-        for(const target of this.obstacles.children){
-            target.stopTweens();
-        }
     }
 }
 
@@ -294,76 +276,11 @@ function init() {
             .repeat(Infinity).yoyo(true).onUpdate(updateRope).start();
     }
 
-    // level 1
-    const level1 = new Level(1, Assets.skybox_forest);
-    level1.obstacles.add(new LinearTarget0(0, 20, -30, "x", "-10", 2000));
-    level1.obstacles.add(new LinearTarget1(20, 0, -30, "x", "-10", 2000));
-    level1.obstacles.add(new LinearTarget0(0, 0, -30, "y", "+10", 2000));
-    level1.obstacles.add(new LinearTarget1(-20, 10, -30, "y", "-10", 2000));
-
-    // level 2
-    const level2 = new Level(2, Assets.skybox_sky);
-    level2.obstacles.add(new LinearTarget0(0, 20, -30, "x", "-10", 1500));
-    level2.obstacles.add(new LinearTarget1(20, 0, -30, "x", "-10", 1500));
-    level2.obstacles.add(new LinearTarget0(0, 0, -30, "y", "+10", 1500));
-    level2.obstacles.add(new LinearTarget1(-20, 10, -30, "y", "-10", 1500));
-    level2.obstacles.add(new LinearTarget0(17, 10, -30, "x", "-15", 1500));
-    level2.obstacles.add(new WingedTarget(-20, 0, -27));
-
-    // level 3
-    const level3 = new Level(3, Assets.skybox_lava);
-    level3.obstacles.add(new LinearTarget0(0, 20, -30, "x", "+10", 1000));
-    level3.obstacles.add(new LinearTarget1(25, 0, -30, "y", "+15", 1000));
-    level3.obstacles.add(new WingedTarget(-30, 0, -30));
-    level3.obstacles.add(new LinearTarget0(0, 0, -30, "y", "+15", 1000));
-    level3.obstacles.add(new PosterTarget(10, 0, -30));
-    level3.obstacles.add(new PosterTarget(-10, 10, -30));
-
-    let current_level = level1;
-    scene.add(level1.obstacles);
-    scene.background = level1.skybox;
-    level1.startTweens();
-
-    const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-
-    function makeMenuCube(cubeGeometry, x, y, z, map) {
-        const obj = new CollidableObject().onCollision(obj => {
-            const {level} = obj.userData;
-            console.log(`Level change to ${level.levelId}`);
-
-            current_level.stopTweens();
-            level.startTweens();
-
-            scene.remove(current_level.obstacles);
-            scene.add(level.obstacles);
-            scene.background = level.skybox;
-
-            current_level = level;
-        });
-
-        const material = new THREE.MeshPhongMaterial({map});
-        const cube = new THREE.Mesh(cubeGeometry, material);
-        cube.position.set(x, y, z);
-
-        obj.add(cube);
-        obj.prepare();
-        scene.add(obj);
-        return obj;
-    }
-
-    const menu_cubes = [
-        makeMenuCube(cubeGeometry, 15, 1.5, -8, Assets.menu1),
-        makeMenuCube(cubeGeometry, 15, 0, -8, Assets.menu2),
-        makeMenuCube(cubeGeometry, 15, -1.5, -8, Assets.menu3),
-    ];
-    menu_cubes[0].userData.level = level1;
-    menu_cubes[1].userData.level = level2;
-    menu_cubes[2].userData.level = level3;
-
+    Levels.init();
+    const levelSelector = new LevelSelector(scene);
 
     const raycaster = new THREE.Raycaster();
 
-    let selected_menu;
     const previousCheckPosition = new THREE.Vector3();
 
     document.addEventListener('mouseup', () => {
@@ -427,6 +344,10 @@ function init() {
         for(const targetGroup of targets) {
             for(const obstacle of targetGroup) {
 
+                if(!obstacle.collidable) {
+                    continue;
+                }
+
                 // The convex hulls are computed at obstacle creation, and are not transformed
                 // when animating. To compensate for this, translate the segment in the
                 // opposite direction of the current translation of this obstacle
@@ -484,20 +405,21 @@ function init() {
 
         if(GameState.current == GameState.Running) {
             TWEEN.update();
-            current_level.animationGroup.update();
+            levelSelector.current.animationGroup.update();
 
-            checkArrowCollision(current_level.obstacles.children, menu_cubes);
+            checkArrowCollision(
+                levelSelector.current.obstacles.children,
+                levelSelector.menu_cubes
+            );
 
             raycaster.setFromCamera({x: 0, y: 0}, camera);
-            const intersects = raycaster.intersectObjects(menu_cubes);
+            const intersects = raycaster.intersectObjects(levelSelector.menu_cubes);
 
             if(intersects.length > 0) {
                 const new_cube = intersects[0].object;
-                selected_menu = new_cube;
-                outlinePass.selectedObjects = [selected_menu];
+                outlinePass.selectedObjects = [new_cube];
             }
             else {
-                selected_menu = undefined;
                 outlinePass.selectedObjects = [];
             }
         }
