@@ -188,18 +188,8 @@ function init() {
         bow.position.copy(ray.origin);
 
         arrow.updatePositionDirection();
-
-        // if(!arrow.inFlight) {
-        //     arrow.rotation.setFromQuaternion(camera.quaternion);
-        //     arrow.position.copy(bow.parts["rope_top"].position);
-        // }
     }
     controls.addEventListener('change', updateFirstPersonObjects);
-
-    Levels.init();
-    const levelSelector = new LevelSelector(scene);
-
-    const raycaster = new THREE.Raycaster();
 
     gameObjects.bow.onMouseUp = () => {
         const {arrow} = gameObjects;
@@ -211,6 +201,9 @@ function init() {
         const ray = new THREE.Ray(worldPosition, worldDirection);
         arrow.shoot(ray);
     };
+
+    Levels.init();
+    const levelSelector = new LevelSelector(scene);
 
     const overlay = new THREE.Scene();
     {
@@ -234,6 +227,8 @@ function init() {
 
     cameraManager.resizeToDisplaySize(renderer, canvas);
     updateFirstPersonObjects();
+
+    const raycaster = new THREE.Raycaster();
 
     const composer = new EffectComposer(renderer);
     const renderPass = new RenderPass(scene, camera);
