@@ -15,8 +15,7 @@ import { GameObject } from './GameObject.js';
 import { Assets } from './Assets.js';
 import { Levels } from './Levels.js';
 import { LevelSelector } from './LevelSelector.js';
-
-const clamp = (x, a, b) => Math.min(Math.max(x, a), b);
+import { Bow } from './Bow.js';
 
 class CameraManager {
     constructor() {
@@ -157,6 +156,7 @@ function init() {
 
     const infoOverlay = document.querySelector("#info");
     infoOverlay.addEventListener('click', () => controls.lock());
+    infoOverlay.addEventListener('mousedown', event => event.stopPropagation());
     infoOverlay.addEventListener('mouseup', event => event.stopPropagation());
     controls.addEventListener('lock', () => {
         infoOverlay.style.display = 'none';
@@ -167,21 +167,9 @@ function init() {
         GameState.current = GameState.Paused;
     });
 
-    const gameObjects = {};
-    {
-        const gltf = Assets.bow;
-        gltf.scene.scale.multiplyScalar(0.1 * 0.1);
-        gltf.scene.position.z = 2.6;
-        gltf.scene.rotation.z = -Math.PI / 2;
-        gltf.scene.rotation.y = Math.PI / 2;
-
-        const obj = new GameObject();
-        obj.add(gltf.scene);
-        scene.add(obj);
-
-        obj.prepare();
-        gameObjects.bow = obj;
-    }
+    const gameObjects = {
+        bow: new Bow()
+    };
     {
         const gltf = Assets.arrow;
         gltf.scene.children[0].scale.multiplyScalar(0.03);
@@ -193,6 +181,10 @@ function init() {
         arrow.prepare();
         gameObjects.arrow = arrow;
     }
+
+    gameObjects.bow.setArrow(gameObjects.arrow);
+
+    scene.add(gameObjects.bow);
 
     function updateFirstPersonObjects() {
         const worldPosition = new THREE.Vector3();
@@ -217,64 +209,6 @@ function init() {
         }
     }
     controls.addEventListener('change', updateFirstPersonObjects);
-
-    {
-        const bow = gameObjects.bow;
-        const top1 = bow.parts["top1"];
-        const top2 = bow.parts["top2"];
-        const bottom1 = bow.parts["bottom1"];
-        const bottom2 = bow.parts["bottom2"];
-        const bottomRope = bow.parts["rope_bottom"];
-        const topRope = bow.parts["rope_top"];
-
-        const ropePosition = new THREE.Vector3();
-        const bowPosition = new THREE.Vector3();
-        const endPosition = new THREE.Vector3();
-
-        function updateRope() {
-            gameObjects.bow.updateMatrixWorld();
-            topRope.updateMatrixWorld();
-            bottomRope.updateMatrixWorld();
-
-            bowPosition.setFromMatrixPosition(gameObjects.bow.matrixWorld);
-            ropePosition.setFromMatrixPosition(bottomRope.matrixWorld);
-            endPosition.setFromMatrixPosition(topRope.matrixWorld);
-
-            const worldDirection = new THREE.Vector3();
-            gameObjects.bow.getWorldDirection(worldDirection);
-            const ray = new THREE.Ray(bowPosition, worldDirection);
-            const yOffset = ray.distanceToPoint(ropePosition);
-
-            const ropeLength = ropePosition.distanceTo(endPosition);
-            const absoluteAngle = Math.acos(clamp(yOffset / ropeLength, -1, 1));
-            const relativeAngle = absoluteAngle - (bottom1.rotation.z + bottom2.rotation.z);
-
-            bottomRope.rotation.z = relativeAngle;
-            topRope.rotation.z = -relativeAngle;
-
-            if(!gameObjects.arrow.inFlight)
-            {
-                topRope.updateMatrixWorld();
-                endPosition.setFromMatrixPosition(topRope.matrixWorld);
-                gameObjects.arrow.position.copy(endPosition);
-            }
-        }
-
-        // controls.addEventListener('change', updateRope);
-
-
-        new TWEEN.Tween(top1.rotation).to({z: Math.PI/12}, 3000)
-            .repeat(Infinity).yoyo(true).onUpdate(updateRope).start();
-
-        new TWEEN.Tween(top2.rotation).to({z: Math.PI/12}, 3000)
-            .repeat(Infinity).yoyo(true).onUpdate(updateRope).start();
-
-        new TWEEN.Tween(bottom1.rotation).to({z: -Math.PI/12}, 3000)
-            .repeat(Infinity).yoyo(true).onUpdate(updateRope).start();
-
-        new TWEEN.Tween(bottom2.rotation).to({z: -Math.PI/12}, 3000)
-            .repeat(Infinity).yoyo(true).onUpdate(updateRope).start();
-    }
 
     Levels.init();
     const levelSelector = new LevelSelector(scene);
