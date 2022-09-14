@@ -57,7 +57,7 @@ export class Bow extends GameObject {
                 t.stop();
             }
             this.tweenMousedown = [
-                new TWEEN.Tween(top1.rotation).to({z: Math.PI/12}, 1000).onUpdate(() => this.updateRope()).onComplete(() => {
+                new TWEEN.Tween(top1.rotation).to({z: Math.PI/12}, 1000).onUpdate(() => this._updateRope()).onComplete(() => {
                     if(this.state == BowState.LoadingReleased) {
                         this.state = BowState.Waiting;
                         this._startMouseUpAnimation();
@@ -66,9 +66,9 @@ export class Bow extends GameObject {
                         this.state = BowState.Ready;
                     }
                 }),
-                new TWEEN.Tween(top2.rotation).to({z: Math.PI/12}, 1000).onUpdate(() => this.updateRope()),
-                new TWEEN.Tween(bottom1.rotation).to({z: -Math.PI/12}, 1000).onUpdate(() => this.updateRope()),
-                new TWEEN.Tween(bottom2.rotation).to({z: -Math.PI/12}, 1000).onUpdate(() => this.updateRope())
+                new TWEEN.Tween(top2.rotation).to({z: Math.PI/12}, 1000).onUpdate(() => this._updateRope()),
+                new TWEEN.Tween(bottom1.rotation).to({z: -Math.PI/12}, 1000).onUpdate(() => this._updateRope()),
+                new TWEEN.Tween(bottom2.rotation).to({z: -Math.PI/12}, 1000).onUpdate(() => this._updateRope())
             ];
             for(const t of this.tweenMousedown) {
                 t.start();
@@ -92,10 +92,10 @@ export class Bow extends GameObject {
             t.stop();
         }
         this.tweenMouseup = [
-            new TWEEN.Tween(this.parts["top1"].rotation).to({z: 0}, 200).onUpdate(() => this.updateRope()),
-            new TWEEN.Tween(this.parts["top2"].rotation).to({z: 0}, 200).onUpdate(() => this.updateRope()),
-            new TWEEN.Tween(this.parts["bottom1"].rotation).to({z: 0}, 200).onUpdate(() => this.updateRope()),
-            new TWEEN.Tween(this.parts["bottom2"].rotation).to({z: 0}, 200).onUpdate(() => this.updateRope())
+            new TWEEN.Tween(this.parts["top1"].rotation).to({z: 0}, 200).onUpdate(() => this._updateRope()),
+            new TWEEN.Tween(this.parts["top2"].rotation).to({z: 0}, 200).onUpdate(() => this._updateRope()),
+            new TWEEN.Tween(this.parts["bottom1"].rotation).to({z: 0}, 200).onUpdate(() => this._updateRope()),
+            new TWEEN.Tween(this.parts["bottom2"].rotation).to({z: 0}, 200).onUpdate(() => this._updateRope())
         ];
         for(const t of this.tweenMouseup) {
             t.start();
@@ -106,7 +106,7 @@ export class Bow extends GameObject {
         }
     }
 
-    updateRope() {
+    _updateRope() {
         const ropePosition = new THREE.Vector3();
         const bowPosition = new THREE.Vector3();
         const endPosition = new THREE.Vector3();
