@@ -7,6 +7,8 @@ const clamp = (x, a, b) => Math.min(Math.max(x, a), b);
 
 class BowState {
     static Waiting = new BowState("Waiting");
+    static Loading = new BowState("Loading");
+    static LoadingReleased = new BowState("LoadingReleased");
     static Ready = new BowState("Ready");
 
     constructor(name) {
@@ -46,16 +48,24 @@ export class Bow extends GameObject {
         this.tweenMouseup = [];
 
         document.addEventListener('mousedown', () => {
-            if(this.arrow.inFlight) {
+            if(this.state != BowState.Waiting || this.arrow.inFlight) {
                 return;
             }
-            this.state = BowState.Ready;
+            this.state = BowState.Loading;
 
             for(const t of this.tweenMouseup) {
                 t.stop();
             }
             this.tweenMousedown = [
-                new TWEEN.Tween(top1.rotation).to({z: Math.PI/12}, 1000).onUpdate(() => this.updateRope()),
+                new TWEEN.Tween(top1.rotation).to({z: Math.PI/12}, 1000).onUpdate(() => this.updateRope()).onComplete(() => {
+                    if(this.state == BowState.LoadingReleased) {
+                        this.state = BowState.Waiting;
+                        this._startMouseUpAnimation();
+                    }
+                    else if(this.state == BowState.Loading) {
+                        this.state = BowState.Ready;
+                    }
+                }),
                 new TWEEN.Tween(top2.rotation).to({z: Math.PI/12}, 1000).onUpdate(() => this.updateRope()),
                 new TWEEN.Tween(bottom1.rotation).to({z: -Math.PI/12}, 1000).onUpdate(() => this.updateRope()),
                 new TWEEN.Tween(bottom2.rotation).to({z: -Math.PI/12}, 1000).onUpdate(() => this.updateRope())
@@ -66,28 +76,34 @@ export class Bow extends GameObject {
         });
 
         document.addEventListener('mouseup', () => {
-            if(this.state != BowState.Ready) {
+            if(this.state == BowState.Loading) {
+                this.state = BowState.LoadingReleased;
                 return;
             }
-            this.state = BowState.Waiting;
-
-            for(const t of this.tweenMousedown) {
-                t.stop();
-            }
-            this.tweenMouseup = [
-                new TWEEN.Tween(top1.rotation).to({z: 0}, 200).onUpdate(() => this.updateRope()),
-                new TWEEN.Tween(top2.rotation).to({z: 0}, 200).onUpdate(() => this.updateRope()),
-                new TWEEN.Tween(bottom1.rotation).to({z: 0}, 200).onUpdate(() => this.updateRope()),
-                new TWEEN.Tween(bottom2.rotation).to({z: 0}, 200).onUpdate(() => this.updateRope())
-            ];
-            for(const t of this.tweenMouseup) {
-                t.start();
-            }
-
-            if(this.onMouseUp != null) {
-                this.onMouseUp();
+            else if(this.state == BowState.Ready) {
+                this.state = BowState.Waiting;
+                this._startMouseUpAnimation();
             }
         });
+    }
+
+    _startMouseUpAnimation() {
+        for(const t of this.tweenMousedown) {
+            t.stop();
+        }
+        this.tweenMouseup = [
+            new TWEEN.Tween(this.parts["top1"].rotation).to({z: 0}, 200).onUpdate(() => this.updateRope()),
+            new TWEEN.Tween(this.parts["top2"].rotation).to({z: 0}, 200).onUpdate(() => this.updateRope()),
+            new TWEEN.Tween(this.parts["bottom1"].rotation).to({z: 0}, 200).onUpdate(() => this.updateRope()),
+            new TWEEN.Tween(this.parts["bottom2"].rotation).to({z: 0}, 200).onUpdate(() => this.updateRope())
+        ];
+        for(const t of this.tweenMouseup) {
+            t.start();
+        }
+
+        if(this.onMouseUp != null) {
+            this.onMouseUp();
+        }
     }
 
     updateRope() {
