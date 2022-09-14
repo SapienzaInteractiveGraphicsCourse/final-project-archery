@@ -76,7 +76,12 @@
             }
             #info > div {
                 padding: 2em;
-                background-color: rgba(238, 238, 238, 0.799);
+                margin: 0;
+                background-color: white;
+            }
+            ul {
+                padding: 0;
+                margin: 0;
             }
             #score {
                 position: absolute;
@@ -105,6 +110,9 @@
                 width: 1.5em;
                 height: 1.5em;
             }
+            .spacer {
+                height: 0.5em;
+            }
         </style>
     </head>
     <body>
@@ -118,11 +126,26 @@
         <div id="info", style="display: none;">
             <div>
                 <div id="legend" style="font-weight: bold;font-family: Iam-Hueca;color:black; ">
-                    HOW TO PLAY:
-                    <li>Aim at targets</li>
-                    <li>Click to shoot the arrow</li>
-                    <li>Score more than x and unlock a new level</li>
-                    <li>Now click to play!</li>
+                    HOW TO PLAY
+                    <div class="spacer"></div>
+
+                    <ul>Click & hold to aim</ul>
+                    <ul>Release to shoot</ul>
+                    <div class="spacer"></div>
+
+                    <ul>Unlock levels 2 and 3 by shooting targets</ul>
+                    <ul>Shoot at the cubes on the right to change level</ul>
+                    <ul>Level 2: 100 points - Level 3: 350 points</ul>
+                    <div class="spacer"></div>
+
+                    <ul>
+                        Targets
+                        <br />
+                        <img class="scoreimage" src="/assets/target0.png"/> 20 points
+                        <img class="scoreimage" src="/assets/target1.png"/> 20 points
+                        <img class="scoreimage" src="/assets/target2.png"/> 50 points
+                        <img class="scoreimage" src="/assets/target3.png"/> 100 points
+                    </ul>
                 </div>
             </div>
         </div>
