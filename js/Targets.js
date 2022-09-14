@@ -176,10 +176,10 @@ export class PosterTarget extends Target {
         this.prepare();
 
         // Hide the obstacle, show it after 5s
-        this.position.x -= 100;
+        this.position.x -= 1000;
         this.addTween(
             new TWEEN.Tween(this.position)
-                .to({x: "+100"}, 5000)
+                .to({x: "+1000"}, 5000)
                 .easing(amount => (amount > 0.99) ? 1 : 0)
                 .onComplete(() => this.state = PosterState.Active)
         );

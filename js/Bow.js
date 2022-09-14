@@ -17,8 +17,6 @@ class BowState {
     toString() {
         return `BowState.${this.name}`;
     }
-
-    static current = BowState.Waiting;
 }
 
 export class Bow extends GameObject {
@@ -92,10 +90,10 @@ export class Bow extends GameObject {
             t.stop();
         }
         this.tweenMouseup = [
-            new TWEEN.Tween(this.parts["top1"].rotation).to({z: 0}, 200).onUpdate(() => this._updateRope()),
-            new TWEEN.Tween(this.parts["top2"].rotation).to({z: 0}, 200).onUpdate(() => this._updateRope()),
-            new TWEEN.Tween(this.parts["bottom1"].rotation).to({z: 0}, 200).onUpdate(() => this._updateRope()),
-            new TWEEN.Tween(this.parts["bottom2"].rotation).to({z: 0}, 200).onUpdate(() => this._updateRope())
+            new TWEEN.Tween(this.parts["top1"].rotation).to({z: 0}, 150).onUpdate(() => this._updateRope()),
+            new TWEEN.Tween(this.parts["top2"].rotation).to({z: 0}, 150).onUpdate(() => this._updateRope()),
+            new TWEEN.Tween(this.parts["bottom1"].rotation).to({z: 0}, 150).onUpdate(() => this._updateRope()),
+            new TWEEN.Tween(this.parts["bottom2"].rotation).to({z: 0}, 150).onUpdate(() => this._updateRope())
         ];
         for(const t of this.tweenMouseup) {
             t.start();
