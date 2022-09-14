@@ -87,6 +87,21 @@
                 position: absolute;
                 left: 0;
                 top: 0;
+                width: 100%;
+                font-size: x-large;
+                color: #000;
+                pointer-events: none;
+                user-select: none;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                font-weight: bold;
+                font-family: Iam-Hueca;
+            }
+            #scoreframe {
+                position: absolute;
+                left: 0;
+                top: 0;
                 font-size: x-large;
                 color: #000;
                 pointer-events: none;
@@ -112,6 +127,20 @@
             }
             .spacer {
                 height: 0.5em;
+            }
+            #levelchange {
+                position: absolute;
+                top: 0.5em;
+                left: 0;
+                width: 100%;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+            }
+            #levelchange > div {
+                padding: 1.1em;
+                display: inline-block;
+                background-color: #D1D1D1;
             }
         </style>
     </head>
@@ -148,13 +177,18 @@
             </div>
         </div>
         <div id="score", style="display: none;">
-            <div>
-                <p>YOUR SCORE IS</p>
+            <div id="scoreframe">
+                <div>
+                    <p>YOUR SCORE IS</p>
+                </div>
+                <div>
+                    <img class="scoreimage" src="/assets/target.png">
+                    <span id="scorenumber">0</span>
+                    <img class="scoreimage" src="/assets/target.png">
+                </div>
             </div>
-            <div>
-                <img class="scoreimage" src="/assets/target.png">
-                <span id="scorenumber">0</span>
-                <img class="scoreimage" src="/assets/target.png">
+            <div id="levelchange" style="display: none;">
+                <div id="leveltext"></div>
             </div>
         </div>
 

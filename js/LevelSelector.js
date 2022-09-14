@@ -24,9 +24,13 @@ export class LevelSelector {
         scene.background = this.current.skybox;
         this.current.startTweens();
 
+        this.levelChangeDiv = document.querySelector("#levelchange");
+        this.levelTextDiv = document.querySelector("#leveltext");
+
         this._setVisibleCubes(ScoreManager.score);
         ScoreManager.addCallback(score => this._setVisibleCubes(score));
     }
+
     _setVisibleCubes(score) {
         // thresholds[i] := score needed to see cube i
         const thresholds = [
@@ -37,6 +41,11 @@ export class LevelSelector {
 
         for(let i = 0; i < this.menu_cubes.length; i++) {
             if(score >= thresholds[i]) {
+                if(!this.menu_cubes[i].visible) {
+                    this.levelTextDiv.innerHTML = `Level ${i+1} unlocked`;
+                    this.levelChangeDiv.style.display = '';
+                    setTimeout(() => this.levelChangeDiv.style.display = 'none', 5000);
+                }
                 this.menu_cubes[i].visible = true;
                 this.menu_cubes[i].collidable = true;
             }
@@ -46,20 +55,9 @@ export class LevelSelector {
             }
         }
     }
+
     _makeMenuCube(cubeGeometry, x, y, z, map) {
-        const obj = new CollidableObject().onCollision(obj => {
-            const {level} = obj.userData;
-            console.log(`Level change to ${level.levelId}`);
-
-            this.current.stopTweens();
-            level.startTweens();
-
-            this.scene.remove(this.current.obstacles);
-            this.scene.add(level.obstacles);
-            this.scene.background = level.skybox;
-
-            this.current = level;
-        });
+        const obj = new CollidableObject().onCollision(obj => this._changeLevel(obj));
 
         const material = new THREE.MeshPhongMaterial({map});
         const cube = new THREE.Mesh(cubeGeometry, material);
@@ -69,5 +67,19 @@ export class LevelSelector {
         obj.prepare();
         this.scene.add(obj);
         return obj;
+    }
+
+    _changeLevel(cube) {
+        const {level} = cube.userData;
+        console.log(`Level change to ${level.levelId}`);
+
+        this.current.stopTweens();
+        level.startTweens();
+
+        this.scene.remove(this.current.obstacles);
+        this.scene.add(level.obstacles);
+        this.scene.background = level.skybox;
+
+        this.current = level;
     }
 }
