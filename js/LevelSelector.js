@@ -11,9 +11,9 @@ export class LevelSelector {
         const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
 
         this.menu_cubes = [
-            this._makeMenuCube(cubeGeometry, 15, 1.5, -8, Assets.menu1),
-            this._makeMenuCube(cubeGeometry, 15, 0, -8, Assets.menu2),
-            this._makeMenuCube(cubeGeometry, 15, -1.5, -8, Assets.menu3),
+            this._makeMenuCube(cubeGeometry, 10, 1.5, -4, Assets.menu1, Assets.menu1normal),
+            this._makeMenuCube(cubeGeometry, 10, 0, -4, Assets.menu2, Assets.menu2normal),
+            this._makeMenuCube(cubeGeometry, 10, -1.5, -4, Assets.menu3, Assets.menu3normal),
         ];
         this.menu_cubes[0].userData.level = Levels.level1;
         this.menu_cubes[1].userData.level = Levels.level2;
@@ -56,10 +56,10 @@ export class LevelSelector {
         }
     }
 
-    _makeMenuCube(cubeGeometry, x, y, z, map) {
+    _makeMenuCube(cubeGeometry, x, y, z, map, normalMap) {
         const obj = new CollidableObject().onCollision(obj => this._changeLevel(obj));
 
-        const material = new THREE.MeshPhongMaterial({map});
+        const material = new THREE.MeshPhongMaterial({map, normalMap});
         const cube = new THREE.Mesh(cubeGeometry, material);
         cube.position.set(x, y, z);
 
