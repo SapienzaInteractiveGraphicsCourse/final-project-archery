@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import * as TWEEN from 'tween';
 import { Assets } from './Assets.js';
 import { GameObject } from './GameObject.js';
+import { GameTimeTween } from './GameTimeTween.js';
 
 const clamp = (x, a, b) => Math.min(Math.max(x, a), b);
 
@@ -55,7 +55,7 @@ export class Bow extends GameObject {
                 t.stop();
             }
             this.tweenMousedown = [
-                new TWEEN.Tween(top1.rotation).to({z: Math.PI/12}, 1000).onUpdate(() => this._updateRope()).onComplete(() => {
+                new GameTimeTween(top1.rotation).to({z: Math.PI/12}, 1000).onUpdate(() => this._updateRope()).onComplete(() => {
                     if(this.state == BowState.LoadingReleased) {
                         this.state = BowState.Waiting;
                         this._startMouseUpAnimation();
@@ -64,9 +64,9 @@ export class Bow extends GameObject {
                         this.state = BowState.Ready;
                     }
                 }),
-                new TWEEN.Tween(top2.rotation).to({z: Math.PI/12}, 1000).onUpdate(() => this._updateRope()),
-                new TWEEN.Tween(bottom1.rotation).to({z: -Math.PI/12}, 1000).onUpdate(() => this._updateRope()),
-                new TWEEN.Tween(bottom2.rotation).to({z: -Math.PI/12}, 1000).onUpdate(() => this._updateRope())
+                new GameTimeTween(top2.rotation).to({z: Math.PI/12}, 1000).onUpdate(() => this._updateRope()),
+                new GameTimeTween(bottom1.rotation).to({z: -Math.PI/12}, 1000).onUpdate(() => this._updateRope()),
+                new GameTimeTween(bottom2.rotation).to({z: -Math.PI/12}, 1000).onUpdate(() => this._updateRope())
             ];
             for(const t of this.tweenMousedown) {
                 t.start();
@@ -90,10 +90,10 @@ export class Bow extends GameObject {
             t.stop();
         }
         this.tweenMouseup = [
-            new TWEEN.Tween(this.parts["top1"].rotation).to({z: 0}, 150).onUpdate(() => this._updateRope()),
-            new TWEEN.Tween(this.parts["top2"].rotation).to({z: 0}, 150).onUpdate(() => this._updateRope()),
-            new TWEEN.Tween(this.parts["bottom1"].rotation).to({z: 0}, 150).onUpdate(() => this._updateRope()),
-            new TWEEN.Tween(this.parts["bottom2"].rotation).to({z: 0}, 150).onUpdate(() => this._updateRope())
+            new GameTimeTween(this.parts["top1"].rotation).to({z: 0}, 150).onUpdate(() => this._updateRope()),
+            new GameTimeTween(this.parts["top2"].rotation).to({z: 0}, 150).onUpdate(() => this._updateRope()),
+            new GameTimeTween(this.parts["bottom1"].rotation).to({z: 0}, 150).onUpdate(() => this._updateRope()),
+            new GameTimeTween(this.parts["bottom2"].rotation).to({z: 0}, 150).onUpdate(() => this._updateRope())
         ];
         for(const t of this.tweenMouseup) {
             t.start();

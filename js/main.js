@@ -15,6 +15,7 @@ import { Levels } from './Levels.js';
 import { LevelSelector } from './LevelSelector.js';
 import { Bow } from './Bow.js';
 import { Arrow } from './Arrow.js';
+import { GameTime, GameTimeTween } from './GameTimeTween.js';
 
 class CameraManager {
     constructor() {
@@ -232,13 +233,16 @@ function init() {
     composer.addPass(renderPass);
     composer.addPass(outlinePass);
 
+    let prevTime = 0;
+
     function render(time) {
-        time *= 0.001;
 
         cameraManager.resizeToDisplaySize(renderer, canvas);
 
         if(GameState.current == GameState.Running) {
-            TWEEN.update();
+            GameTime.advance(time - prevTime);
+
+            TWEEN.update(GameTime.now());
 
             gameObjects.arrow.checkCollision(
                 levelSelector.current.obstacles.children,
@@ -262,6 +266,7 @@ function init() {
         renderer.clearDepth();
         renderer.render(overlay, overlayCamera);
 
+        prevTime = time;
         requestAnimationFrame(render);
     }
     requestAnimationFrame(render);

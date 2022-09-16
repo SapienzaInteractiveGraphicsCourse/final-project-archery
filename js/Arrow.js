@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import * as TWEEN from 'tween';
 import { Assets } from './Assets.js';
 import { GameObject } from './GameObject.js';
+import { GameTimeTween } from './GameTimeTween.js';
 
 export class Arrow extends GameObject {
     bow = null;
@@ -39,10 +39,10 @@ export class Arrow extends GameObject {
         this.previousCheckPosition.setFromMatrixPosition(this.parts["arrow_tip"].matrixWorld);
         this.savedRotation.copy(this.bow.rotation);
 
-        const tween = new TWEEN.Tween(this.position);
+        const tween = new GameTimeTween(this.position);
         tween.to({x: ray.origin.x, y: ray.origin.y, z: ray.origin.z}, 1000);
         tween.chain(
-            new TWEEN.Tween(this.position)
+            new GameTimeTween(this.position)
                 .to({x: 0, y: 0, z: 2.2}, 1)
                 .onComplete(() => {
                     this.inFlight = false;

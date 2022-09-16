@@ -3,6 +3,7 @@ import { Assets } from './Assets.js';
 import { CollidableObject } from './GameObject.js';
 import { Levels } from './Levels.js';
 import { ScoreManager } from './ScoreManager.js';
+import { GameTimeTween } from './GameTimeTween.js';
 
 export class LevelSelector {
     constructor(scene) {
@@ -44,7 +45,7 @@ export class LevelSelector {
                 if(!this.menu_cubes[i].visible) {
                     this.levelTextDiv.innerHTML = `Level ${i+1} unlocked`;
                     this.levelChangeDiv.style.display = '';
-                    setTimeout(() => this.levelChangeDiv.style.display = 'none', 5000);
+                    new GameTimeTween({}).to({}, 5000).onComplete(() => this.levelChangeDiv.style.display = 'none').start();
                 }
                 this.menu_cubes[i].visible = true;
                 this.menu_cubes[i].collidable = true;

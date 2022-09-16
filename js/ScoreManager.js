@@ -1,4 +1,4 @@
-import * as TWEEN from 'tween';
+import { GameTimeTween } from "./GameTimeTween.js";
 
 export class ScoreManager {
     static score = 0;
@@ -19,7 +19,7 @@ export class ScoreManager {
             callback(ScoreManager.score);
         }
 
-        new TWEEN.Tween(ScoreManager)
+        new GameTimeTween(ScoreManager)
             .to({shownScore: ScoreManager.shownScore + points}, 500)
             .onUpdate(() => ScoreManager.scoreText.innerHTML = ScoreManager.shownScore | 0)
             .start();

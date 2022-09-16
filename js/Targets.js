@@ -3,6 +3,7 @@ import * as SkeletonUtils from './examples/jsm/utils/SkeletonUtils.js';
 import { Assets } from './Assets.js';
 import { CollidableObject } from './GameObject.js';
 import { ScoreManager } from './ScoreManager.js';
+import { GameTimeTween } from './GameTimeTween.js';
 
 class Target extends CollidableObject {
     constructor() {
@@ -42,7 +43,7 @@ class LinearTarget extends Target {
 
         const to = (axis == "x") ? {x: offset} : {y: offset};
         this.addTween(
-            new TWEEN.Tween(this.position)
+            new GameTimeTween(this.position)
             .to(to, time)
             .yoyo(true).repeat(Infinity)
         );
@@ -79,12 +80,12 @@ export class WingedTarget extends Target {
 
         // Wings
         this.addTween(
-            new TWEEN.Tween(this.parts["left_wing"].rotation)
+            new GameTimeTween(this.parts["left_wing"].rotation)
             .to({y: Math.PI / 6}, 1000)
             .yoyo(true).repeat(Infinity)
         );
         this.addTween(
-            new TWEEN.Tween(this.parts["right_wing"].rotation)
+            new GameTimeTween(this.parts["right_wing"].rotation)
             .to({y: Math.PI / 6}, 1000)
             .yoyo(true).repeat(Infinity)
         );
@@ -95,20 +96,20 @@ export class WingedTarget extends Target {
 
         // x axis
         this.addTween(
-            new TWEEN.Tween(this.position)
+            new GameTimeTween(this.position)
             .to({x: `+${2*radius}`}, duration)
             .yoyo(true).repeat(Infinity)
             .easing(TWEEN.Easing.Sinusoidal.InOut)
         );
 
         // y axis
-        const a = new TWEEN.Tween(this.position)
+        const a = new GameTimeTween(this.position)
             .to({y: `+${radius}`}, duration / 2)
             .easing(TWEEN.Easing.Sinusoidal.Out);
-        const b = new TWEEN.Tween(this.position)
+        const b = new GameTimeTween(this.position)
             .to({y: `-${2*radius}`}, duration)
             .easing(TWEEN.Easing.Sinusoidal.InOut);
-        const c = new TWEEN.Tween(this.position)
+        const c = new GameTimeTween(this.position)
             .to({y: `+${radius}`}, duration / 2)
             .easing(TWEEN.Easing.Sinusoidal.In);
 
@@ -148,19 +149,19 @@ export class PosterTarget extends Target {
                 this.state = PosterState.Hit;
 
                 // boom
-                new TWEEN.Tween(this.parts["upper_left"].position)
+                new GameTimeTween(this.parts["upper_left"].position)
                     .to({x: "-100", z: "+100"}, 2000)
                     .easing(TWEEN.Easing.Quadratic.In)
                     .start();
-                new TWEEN.Tween(this.parts["upper_right"].position)
+                new GameTimeTween(this.parts["upper_right"].position)
                     .to({x: "+100", z: "+100"}, 2000)
                     .easing(TWEEN.Easing.Quadratic.In)
                     .start();
-                new TWEEN.Tween(this.parts["lower_left"].position)
+                new GameTimeTween(this.parts["lower_left"].position)
                     .to({x: "-100", z: "-100"}, 2000)
                     .easing(TWEEN.Easing.Quadratic.In)
                     .start();
-                new TWEEN.Tween(this.parts["lower_right"].position)
+                new GameTimeTween(this.parts["lower_right"].position)
                     .to({x: "+100", z: "-100"}, 2000)
                     .easing(TWEEN.Easing.Quadratic.In)
                     .start();
@@ -178,7 +179,7 @@ export class PosterTarget extends Target {
         // Hide the obstacle, show it after 5s
         this.position.x -= 1000;
         this.addTween(
-            new TWEEN.Tween(this.position)
+            new GameTimeTween(this.position)
                 .to({x: "+1000"}, 5000)
                 .easing(amount => (amount > 0.99) ? 1 : 0)
                 .onComplete(() => this.state = PosterState.Active)
