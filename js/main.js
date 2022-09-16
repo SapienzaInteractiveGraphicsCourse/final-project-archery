@@ -15,7 +15,7 @@ import { Levels } from './Levels.js';
 import { LevelSelector } from './LevelSelector.js';
 import { Bow } from './Bow.js';
 import { Arrow } from './Arrow.js';
-import { GameTime, GameTimeTween } from './GameTimeTween.js';
+import { GameTime } from './GameTimeTween.js';
 
 class CameraManager {
     constructor() {
