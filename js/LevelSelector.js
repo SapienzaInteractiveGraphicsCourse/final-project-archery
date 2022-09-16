@@ -11,6 +11,9 @@ export class LevelSelector {
 
         const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
 
+        this.menu = new THREE.Object3D();
+        scene.add(this.menu);
+
         this.menu_cubes = [
             this._makeMenuCube(cubeGeometry, 10, 1.5, -4, Assets.menu1, Assets.menu1normal),
             this._makeMenuCube(cubeGeometry, 10, 0, -4, Assets.menu2, Assets.menu2normal),
@@ -66,7 +69,7 @@ export class LevelSelector {
 
         obj.add(cube);
         obj.prepare();
-        this.scene.add(obj);
+        this.menu.add(obj);
         return obj;
     }
 
