@@ -1,12 +1,10 @@
 import * as THREE from 'three';
-import * as TWEEN from 'tween';
 import { Assets } from './Assets.js';
 import { LinearTarget0, LinearTarget1, WingedTarget, PosterTarget } from './Targets.js';
 
 class Level {
     constructor(levelId, skybox) {
         this.levelId = levelId;
-        this.animationGroup = new TWEEN.Group();
         this.obstacles = new THREE.Object3D();
         this.skybox = skybox;
     }

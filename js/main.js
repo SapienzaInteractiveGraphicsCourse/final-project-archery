@@ -2,7 +2,6 @@
 
 import * as THREE from 'three';
 import * as TWEEN from 'tween';
-import { OrbitControls } from './examples/jsm/controls/OrbitControls.js';
 import { PointerLockControls } from './examples/jsm/controls/PointerLockControls.js';
 
 import { GLTFLoader } from './examples/jsm/loaders/GLTFLoader.js';
@@ -138,9 +137,6 @@ function init() {
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
-    // const controls = new OrbitControls(camera, canvas);
-    // controls.target.set(0, 0, 0);
-    // controls.update();
     const controls = new PointerLockControls(camera, canvas);
     controls.minPolarAngle = 0.1;
     controls.maxPolarAngle = Math.PI - 0.1;
@@ -243,7 +239,6 @@ function init() {
 
         if(GameState.current == GameState.Running) {
             TWEEN.update();
-            levelSelector.current.animationGroup.update();
 
             gameObjects.arrow.checkCollision(
                 levelSelector.current.obstacles.children,
