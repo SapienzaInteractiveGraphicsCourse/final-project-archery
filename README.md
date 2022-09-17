@@ -10,3 +10,11 @@
 Here is the link to play the game:
 
 ### [Click to play](https://sapienzainteractivegraphicscourse.github.io/final-project-archery/)
+
+ 
+ Authors: 
+ 
+ <p>Simone Gennenzi </p>
+ <p>Giorgia Ristich </p>
+ <p>Dario Petrillo </p>
+
