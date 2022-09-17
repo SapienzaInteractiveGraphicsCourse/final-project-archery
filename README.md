@@ -7,4 +7,6 @@
 <img src="/instructions.png"></img>
 <img src="/level1.png"></img>
 
+Here is the link to play the game:
+
 ### [Click to play](https://sapienzainteractivegraphicscourse.github.io/final-project-archery/)
